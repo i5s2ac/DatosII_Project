@@ -19,15 +19,33 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+          to bottom,
+          transparent,
+          rgb(var(--background-end-rgb))
+  )
+  rgb(var(--background-start-rgb));
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+input {
+  outline: none;
+}
+
+button:focus {
+  outline: none;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.bg-blue-600 {
+  background-color: #4F46E5; /* color azul similar al de la imagen */
+}
+
+.bg-blue-700 {
+  background-color: #4338CA; /* color azul oscuro para hover */
 }

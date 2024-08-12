@@ -1,11 +1,14 @@
 "use client";  // Esto marca el archivo como un componente del cliente
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function Home() {
     const [searchTerm, setSearchTerm] = useState("");
     const [products, setProducts] = useState([]);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         // Fetch products from the API
@@ -21,13 +24,36 @@ export default function Home() {
         product.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleLogout = () => {
+        // Aquí debes añadir la lógica para manejar el logout
+        router.push('/auth'); // Redirige a la página de login después de logout
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             <header className="relative bg-cover bg-center text-white h-[50vh]" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}>
                 <div className="absolute inset-0 bg-black opacity-60"></div>
                 <div className="relative z-10 max-w-8xl mx-auto flex justify-between items-center p-6">
                     <h1 className="text-2xl font-bold text-left">TechStore</h1>
-
+                    <div className="relative">
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="flex items-center space-x-3">
+                            <Image src="/images/Profile.jpg" alt="Profile" width={34} height={34} className="rounded-full" />
+                            <span className="text-xl">Hacker19823</span>
+                            <svg className={`w-5 h-5 transform ${isMenuOpen ? 'rotate-180' : 'rotate-0'} transition-transform`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        {isMenuOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-20">
+                                <button
+                                    onClick={handleLogout}
+                                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-200"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <div className="relative z-10 max-w-7xl mx-auto text-center py-20">
                     <h2 className="text-6xl font-bold mb-7 text-center">Welcome To Our Online Store</h2>
