@@ -1,0 +1,29 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'techstore'
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: 'test'
+      MYSQL_ROOT_PASSWORD: 'test'
+    ports:
+      - '3306:3306'
+
+  redis:
+    image: redis:7.0.7
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_NAME: techstore
+    volumes:
+      - .:/app
