@@ -19,7 +19,9 @@ export default async function handler(req, res) {
         try {
             await sequelize.authenticate();
 
+            console.log('Fetching user with ID:', decoded.id);
             const user = await User.findByPk(decoded.id, { attributes: ['id', 'username', 'email'] });
+            console.log('User query result:', user);
 
             if (user) {
                 res.status(200).json({ success: true, user });

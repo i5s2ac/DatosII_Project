@@ -21,7 +21,7 @@ const Product = sequelize.define('Product', {
     },
 }, {
     timestamps: true,
-    tableName: 'products'  // Asegúrate de que el nombre de la tabla es correcto
+    tableName: 'Products'
 });
 
 export default Product;

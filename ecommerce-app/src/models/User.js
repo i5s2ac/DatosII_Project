@@ -17,7 +17,7 @@ const User = sequelize.define('User', {
     },
 }, {
     timestamps: true,
-    tableName: 'users', // Asegúrate de que coincide con el nombre de la tabla en la base de datos
+    tableName: 'users',
 });
 
 export default User;

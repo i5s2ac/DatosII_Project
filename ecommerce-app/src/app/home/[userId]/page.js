@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function UserPage({ params }) {
+    const { userId } = params; // Extrayendo el userId desde params
     const [products, setProducts] = useState([]);
     const [username, setUsername] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const router = useRouter();
-    const userId = params.userId;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -19,13 +19,20 @@ export default function UserPage({ params }) {
         };
 
         const fetchUser = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                router.push('/auth/login');
+                return;
+            }
+
             const res = await fetch(`/api/user/${userId}`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             const data = await res.json();
-            if (data.success) {
+
+            if (data.success && data.user.id === parseInt(userId)) {
                 setUsername(data.user.username);
             } else {
                 router.push('/auth/login');

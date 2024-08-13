@@ -8,22 +8,16 @@ export default async function handler(req, res) {
         const { email, password } = req.body;
 
         try {
-            await sequelize.authenticate();
+            await sequelize.authenticate();  // Verifica la conexión a la base de datos
 
             const user = await User.findOne({ where: { email } });
 
-            if (!user) {
-                return res.status(401).json({ success: false, message: 'Invalid credentials' });
+            if (user && bcrypt.compareSync(password, user.password)) {
+                const token = generateToken(user);  // Genera el token con id, email y username
+                res.status(200).json({ success: true, token, userId: user.id });
+            } else {
+                res.status(401).json({ success: false, message: 'Invalid credentials' });
             }
-
-            const validPassword = await bcrypt.compare(password, user.password);
-
-            if (!validPassword) {
-                return res.status(401).json({ success: false, message: 'Invalid credentials' });
-            }
-
-            const token = generateToken(user.id);
-            res.status(200).json({ success: true, token, userId: user.id });
         } catch (error) {
             console.error('Error connecting to the database:', error);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
