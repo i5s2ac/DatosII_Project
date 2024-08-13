@@ -1,30 +1,23 @@
-import { Sequelize, DataTypes } from 'sequelize';
-import sequelize from '../../lib/sequelize';
-
-const Product = sequelize.define('Product', {
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    description: {
-        type: DataTypes.TEXT,
-    },
-    imageUrl: {
-        type: DataTypes.STRING,
-    },
-    price: {
-        type: DataTypes.DECIMAL(10, 2),
-    },
-}, {
-    timestamps: true,
-});
+import Product from '@/models/Product';
+import sequelize from '@/lib/sequelize';
 
 export default async function handler(req, res) {
+    const { userId } = req.query;
+
     try {
-        await sequelize.sync();
-        const products = await Product.findAll();
-        res.status(200).json(products);
+        await sequelize.authenticate();
+
+        const products = await Product.findAll({
+            where: { userId: userId }
+        });
+
+        if (products) {
+            res.status(200).json(products);
+        } else {
+            res.status(404).json({ success: false, message: 'No products found for this user' });
+        }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error fetching products:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 }
