@@ -39,7 +39,7 @@ export default function LoginPage() {
         <div className="min-h-screen flex">
             <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-16">
                 <div className="w-full max-w-md">
-                    <h2 className="text-5xl font-bold mb-10 text-gray-800">Welcome back!</h2>
+                    <h2 className="text-5xl font-bold mb-10 text-gray-800">¡Welcome Back!</h2>
                     <p className="text-xl text-gray-600 mb-8">Enter your email address and password to access your account.</p>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}></div>
+            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/Working.png')" }}></div>
         </div>
     );
 }

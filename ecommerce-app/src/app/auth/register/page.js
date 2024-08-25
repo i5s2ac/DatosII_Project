@@ -116,7 +116,7 @@ export default function RegisterPage() {
                 </div>
             </div>
 
-            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}></div>
+            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/Team.png')" }}></div>
         </div>
     );
 }

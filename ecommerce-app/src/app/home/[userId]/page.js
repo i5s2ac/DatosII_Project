@@ -53,7 +53,7 @@ export default function UserPage({ params }) {
             <header className="relative bg-cover bg-center text-white h-[50vh]" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}>
                 <div className="absolute inset-0 bg-black opacity-60"></div>
                 <div className="relative z-10 max-w-8xl mx-auto flex justify-between items-center p-6">
-                    <h1 className="text-2xl font-bold text-left">TechStore</h1>
+                    <h1 className="text-2xl font-bold text-left">Matchify</h1>
                     <div className="relative">
                         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="flex items-center space-x-3">
                             <Image src="/images/Profile.jpg" alt="Profile" width={34} height={34} className="rounded-full" />

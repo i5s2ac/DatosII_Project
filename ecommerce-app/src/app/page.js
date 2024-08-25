@@ -40,13 +40,11 @@ export default function WelcomePage() {
 
                 <main className="flex-grow flex flex-col justify-center items-start px-8 md:px-16 lg:px-32">
                     <div className="max-w-lg">
-                        <h1 className="text-4xl font-bold text-gray-800 mb-12">TechStore</h1>
+                        <h1 className="text-4xl font-bold text-gray-800 mb-12">Matchify</h1>
                         <h2 className="text-5xl font-extrabold mb-4 leading-tight text-gray-800">
-                            Welcome to the best tech store in LATAM
-                        </h2>
+                            The best online recruitment and job search software                        </h2>
                         <p className="text-lg text-gray-600 mb-12">
-                            Discover the latest technology at unbeatable prices.
-                        </p>
+                            The best online recruitment and job search software streamlines hiring for employers and simplifies job searching for candidates.</p>
                         <div className="flex space-x-4">
                             <button
                                 onClick={handleRegisterClick}
@@ -81,7 +79,7 @@ export default function WelcomePage() {
             <div
                 className="w-1/2 bg-cover bg-center"
                 style={{
-                    backgroundImage: "url('/images/Cover.png')", // Replace with your image path
+                    backgroundImage: "url('/images/Recluit.png')", // Replace with your image path
                 }}
             ></div>
         </div>
