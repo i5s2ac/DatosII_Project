@@ -8,6 +8,8 @@ export default async function handler(req, res) {
         const { email, password } = req.body;
 
         try {
+            await sequelize.sync();
+            
             await sequelize.authenticate();  // Verifica la conexión a la base de datos
 
             const user = await User.findOne({ where: { email } });

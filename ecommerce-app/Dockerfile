@@ -18,5 +18,5 @@ COPY . .
 # Expone el puerto en el que la aplicación correrá.
 EXPOSE 3000
 
-# Comando para correr la aplicación en modo desarrollo.
-CMD ["npm", "run", "dev"]
+# Define una entrada para ejecutar el script de inicialización y luego iniciar la aplicación
+CMD ["npm run dev"]

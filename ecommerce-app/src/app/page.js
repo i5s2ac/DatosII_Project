@@ -1,8 +1,24 @@
 "use client";
-
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function WelcomePage() {
+
+    useEffect(() => {
+        // Llama a la API para sincronizar los modelos
+        const syncModels = async () => {
+            try {
+                const response = await fetch('/api/sync');
+                const data = await response.json();
+                console.log(data.message);
+            } catch (error) {
+                console.error('Error syncing models:', error);
+            }
+        };
+
+        syncModels();
+    }, []);
+    
     const router = useRouter();
 
     const handleLoginClick = () => {
@@ -13,11 +29,14 @@ export default function WelcomePage() {
         router.push("/auth/register");
     };
 
+    const handleEnterpriseRegisterClick = () => {
+        router.push("/auth/register_enterprise");
+    };
+
     return (
         <div className="relative min-h-screen flex">
             {/* Left half with white background and text */}
             <div className="w-1/2 bg-white flex flex-col justify-between text-black">
-
 
                 <main className="flex-grow flex flex-col justify-center items-start px-8 md:px-16 lg:px-32">
                     <div className="max-w-lg">
@@ -40,6 +59,14 @@ export default function WelcomePage() {
                                 className="px-6 py-3 bg-transparent border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
                             >
                                 Log in into my account
+                            </button>
+                        </div>
+                        <div className="flex space-x-4 mt-4">
+                            <button
+                                onClick={handleEnterpriseRegisterClick}
+                                className="px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition duration-300"
+                            >
+                                Enterprise
                             </button>
                         </div>
                     </div>

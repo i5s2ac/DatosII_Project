@@ -1,10 +1,12 @@
-import Product from '@/models/Product';
+import Product from '@/models/CandidatoOferta';
 import sequelize from '@/lib/sequelize';
 
 export default async function handler(req, res) {
     const { userId } = req.query;
 
     try {
+        await sequelize.sync();
+        
         await sequelize.authenticate();
 
         const products = await Product.findAll({
