@@ -3,11 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function RegisterPage() {
+export default function RegisterCompanyPage() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [sector, setSector] = useState('');
+    const [location, setLocation] = useState('');
+    const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
 
@@ -24,13 +28,17 @@ export default function RegisterPage() {
                 email,
                 password,
                 phone,
+                companyName,
+                sector,
+                location,
+                description,
             }),
         });
 
         const data = await res.json();
 
         if (data.success) {
-            router.push('/auth/login'); // Redirige a la página de login después de un registro exitoso
+            router.push('/auth/login'); // Redirect to the login page after successful registration
         } else {
             setErrorMessage(data.message || 'Registration failed, please try again.');
         }
@@ -40,7 +48,7 @@ export default function RegisterPage() {
         <div className="min-h-screen flex">
             <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-16">
                 <div className="w-full max-w-md">
-                    <h2 className="text-5xl font-bold mb-10 text-gray-800">Create an account</h2>
+                    <h2 className="text-5xl font-bold mb-10 text-gray-800">Register your company</h2>
 
                     <form className="space-y-6" onSubmit={handleRegister}>
                         <div>
@@ -74,7 +82,7 @@ export default function RegisterPage() {
                             <input
                                 type="password"
                                 id="password"
-                                className="mt-1 block w-full p-4 border text-black-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                                 placeholder="Enter your password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -83,7 +91,7 @@ export default function RegisterPage() {
                         </div>
 
                         <div>
-                            <label htmlFor="phone" className="block text-lg font-medium text-gray-700">Phone Number</label>
+                            <label htmlFor="phone" className="block text-lg font-medium text-gray-700">Phone</label>
                             <input
                                 type="text"
                                 id="phone"
@@ -92,6 +100,55 @@ export default function RegisterPage() {
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="companyName" className="block text-lg font-medium text-gray-700">Company Name</label>
+                            <input
+                                type="text"
+                                id="companyName"
+                                className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                placeholder="Enter your company name"
+                                value={companyName}
+                                onChange={(e) => setCompanyName(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="sector" className="block text-lg font-medium text-gray-700">Sector</label>
+                            <input
+                                type="text"
+                                id="sector"
+                                className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                placeholder="Enter your company's sector"
+                                value={sector}
+                                onChange={(e) => setSector(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="location" className="block text-lg font-medium text-gray-700">Location</label>
+                            <input
+                                type="text"
+                                id="location"
+                                className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                placeholder="Enter your company's location"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="description" className="block text-lg font-medium text-gray-700">Description</label>
+                            <textarea
+                                id="description"
+                                className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                placeholder="Enter a brief description of your company"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
 
@@ -116,8 +173,7 @@ export default function RegisterPage() {
                 </div>
             </div>
 
-            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/Team.png')" }}></div>
+            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}></div>
         </div>
     );
 }
-

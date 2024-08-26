@@ -10,16 +10,21 @@ services:
       MYSQL_ROOT_PASSWORD: 'test'
     ports:
       - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
 
   redis:
     image: redis:7.0.7
     ports:
       - "6379:6379"
-
+    
   web:
     build: .
     ports:
       - "3000:3000"
+    depends_on:
+      - db
+    command: sh -c "node src/lib/sequelize.js && npm run dev"
     environment:
       DB_HOST: db
       DB_USER: test
@@ -27,3 +32,6 @@ services:
       DB_NAME: techstore
     volumes:
       - .:/app
+      
+volumes:
+  db_data:
