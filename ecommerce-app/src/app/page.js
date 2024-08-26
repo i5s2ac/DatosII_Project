@@ -17,15 +17,26 @@ export default function WelcomePage() {
         <div className="relative min-h-screen flex">
             {/* Left half with white background and text */}
             <div className="w-1/2 bg-white flex flex-col justify-between text-black">
-
-
                 <main className="flex-grow flex flex-col justify-center items-start px-8 md:px-16 lg:px-32">
                     <div className="max-w-lg">
-                        <h1 className="text-4xl font-bold text-gray-800 mb-12">Matchify</h1>
+                        {/* Logo */}
+                        <div
+                            className="mb-8"
+                            style={{
+                                backgroundImage: "url('/images/Matchify_logo.png')", // Replace with your image path
+                                backgroundSize: "contain",
+                                backgroundRepeat: "no-repeat",
+                                backgroundPosition: "center",
+                                width: "250px", // Adjust the width to fit your logo
+                                height: "100px", // Adjust the height to fit your logo
+                            }}
+                        ></div>
                         <h2 className="text-5xl font-extrabold mb-4 leading-tight text-gray-800">
-                            The best online recruitment and job search software                        </h2>
+                            The best online recruitment and job search software.
+                        </h2>
                         <p className="text-lg text-gray-600 mb-12">
-                            The best online recruitment and job search software streamlines hiring for employers and simplifies job searching for candidates.</p>
+                            The best online recruitment and job search software streamlines hiring for employers and simplifies job searching for candidates.
+                        </p>
                         <div className="flex space-x-4">
                             <button
                                 onClick={handleRegisterClick}
@@ -35,7 +46,7 @@ export default function WelcomePage() {
                             </button>
                             <button
                                 onClick={handleLoginClick}
-                                className="px-6 py-3 bg-transparent border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition duration-300"
+                                className="px-6 py-3 bg-transparent border border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition duration-300"
                             >
                                 Log in into my account
                             </button>
@@ -44,7 +55,7 @@ export default function WelcomePage() {
                 </main>
 
                 <footer className="w-full py-4 text-center text-gray-500">
-                    &copy; 2024 TechStore. All rights reserved.
+                    &copy; 2024 Matchify. All rights reserved.
                 </footer>
             </div>
 
@@ -52,7 +63,7 @@ export default function WelcomePage() {
             <div
                 className="w-1/2 bg-cover bg-center"
                 style={{
-                    backgroundImage: "url('/images/Recluit.png')", // Replace with your image path
+                    backgroundImage: "url('/images/Job_Recluit.png')", // Replace with your image path
                 }}
             ></div>
         </div>

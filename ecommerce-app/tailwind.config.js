@@ -13,7 +13,7 @@ module.exports = {
       },
       colors: {
         primary: '#1D4ED8',  // Azul primario
-        secondary: '#9333EA',  // Púrpura secundario
+        secondary: '#ef4141',  // Púrpura secundario
       },
       boxShadow: {
         'custom-light': '0 2px 8px rgba(0, 0, 0, 0.1)',
