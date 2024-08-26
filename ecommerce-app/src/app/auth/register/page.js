@@ -40,7 +40,7 @@ export default function RegisterPage() {
         <div className="min-h-screen flex">
             <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-16">
                 <div className="w-full max-w-md">
-                    <h2 className="text-5xl font-bold mb-10 text-gray-800">Create an account</h2>
+                    <h2 className="text-5xl font-bold mb-10 text-gray-800">Create an Account</h2>
 
                     <form className="space-y-6" onSubmit={handleRegister}>
                         <div>
