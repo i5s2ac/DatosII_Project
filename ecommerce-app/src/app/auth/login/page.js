@@ -29,7 +29,7 @@ export default function LoginPage() {
             // Almacenar el token en localStorage
             localStorage.setItem('token', data.token);
             // Redirigir al usuario a su página específica basada en su userId
-            router.push(`/home/${data.userId}`);
+            router.push(`/home/user/${data.userId}`);
         } else {
             setErrorMessage('Login failed, please try again.');
         }
