@@ -1,14 +1,14 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../lib/sequelize');
-const Empresa = require('./Empresa');
+const Empresa = require('./Empresa');  // Asegúrate de que la ruta y nombre del archivo son correctos
 const User = require('./User');
-const Rol = require('./ROL');
+const Rol = require('./Rol');
 
 const EmpresaUsuario = sequelize.define('EmpresaUsuario', {
     empresaId: {
         type: DataTypes.INTEGER,
         references: {
-            model: Empresa,
+            model: Empresa,  // Aquí debe estar el modelo correcto
             key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -17,7 +17,7 @@ const EmpresaUsuario = sequelize.define('EmpresaUsuario', {
     usuarioId: {
         type: DataTypes.INTEGER,
         references: {
-            model: User,
+            model: User,  // Aquí debe estar el modelo correcto
             key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -26,7 +26,7 @@ const EmpresaUsuario = sequelize.define('EmpresaUsuario', {
     rolId: {
         type: DataTypes.INTEGER,
         references: {
-            model: Rol,
+            model: Rol,  // Aquí debe estar el modelo correcto
             key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -36,4 +36,4 @@ const EmpresaUsuario = sequelize.define('EmpresaUsuario', {
     tableName: 'empresa_usuario',
 });
 
-export default EmpresaUsuario;
+module.exports = EmpresaUsuario;

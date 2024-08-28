@@ -3,7 +3,7 @@ import Empresa from '@/models/Empresa';
 import User from '@/models/User';
 import Industria from '@/models/Industria';
 import EmpresaUsuario from '@/models/EmpresaUsuario';
-import Rol from '@/models/ROL';
+import Rol from '@/models/Rol';
 import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
@@ -14,13 +14,13 @@ export default async function handler(req, res) {
             password,
             phone,
             companyName,
-            sector,
-            location,
-            description,
+            direccion,
+            descripcion,
+            sitioWeb 
         } = req.body;
 
-        // Validación de campos requeridos
-        if (!username || !email || !password || !phone || !companyName || !sector) {
+        // Validación de campos requeridos (sin sector)
+        if (!username || !email || !password || !phone || !companyName) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
 
@@ -32,12 +32,6 @@ export default async function handler(req, res) {
             const existingUser = await User.findOne({ where: { email } });
             if (existingUser) {
                 return res.status(400).json({ success: false, message: 'Email already in use' });
-            }
-
-            // Verifica si el sector existe en la tabla de Industrias
-            const industria = await Industria.findOne({ where: { nombre: sector } });
-            if (!industria) {
-                return res.status(400).json({ success: false, message: 'Invalid sector' });
             }
 
             // Crea el usuario
@@ -52,11 +46,12 @@ export default async function handler(req, res) {
             // Crea la empresa
             const empresa = await Empresa.create({
                 nombre: companyName,
-                direccion: location,
+                direccion, // Corregido
                 telefono: phone,
                 email,
-                descripcion: description,
-                industriaId: industria.id,
+                descripcion, // Corregido
+                sitioWeb, // Asegúrate de que este campo esté incluido
+                industriaId: 1,  // Aquí puedes poner un valor por defecto para el campo industriaId si es necesario
             });
 
             // Verifica si el rol "Admin" ya existe, si no, lo crea

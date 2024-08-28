@@ -1,4 +1,3 @@
-// /lib/sequelize.js
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
@@ -14,9 +13,5 @@ const sequelize = new Sequelize(
     }
 );
 
-// Sincronizar todos los modelos
-sequelize.sync()
-    .then(() => console.log('Models synchronized successfully'))
-    .catch(error => console.error('Error synchronizing models:', error));
+module.exports = sequelize;  // Exporta correctamente el objeto sequelize
 
-module.exports = sequelize;

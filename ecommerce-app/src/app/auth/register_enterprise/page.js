@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterCompanyPage() {
     const [step, setStep] = useState(1);
+    const [industrias, setIndustrias] = useState([]);
+    const [loadingIndustrias, setLoadingIndustrias] = useState(false);
+    const [errorIndustrias, setErrorIndustrias] = useState('');
+    const [selectedIndustria, setSelectedIndustria] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,8 +22,28 @@ export default function RegisterCompanyPage() {
     const [formError, setFormError] = useState('');
     const router = useRouter();
 
+    useEffect(() => {
+        const fetchIndustrias = async () => {
+            setLoadingIndustrias(true);
+            try {
+                const response = await fetch('/api/industrias');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch industries');
+                }
+                const data = await response.json();
+                setIndustrias(data);
+                setErrorIndustrias('');
+            } catch (error) {
+                setErrorIndustrias('Could not load industries. Please try again later.');
+                console.error('Error fetching industries:', error);
+            }
+            setLoadingIndustrias(false);
+        };
+        fetchIndustrias();
+    }, []);
+
     const handleNextStep = () => {
-        if (!companyName || !direccion || !telefono || !email || !sitioWeb) {
+        if (!companyName || !direccion || !telefono || !email || !sitioWeb || !selectedIndustria) {
             setFormError('Please fill out all required fields.');
         } else {
             setFormError('');
@@ -33,8 +57,7 @@ export default function RegisterCompanyPage() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
-        const res = await fetch('/api/register', {
+        const res = await fetch('/api/register_enterprise', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -49,13 +72,12 @@ export default function RegisterCompanyPage() {
                 telefono,
                 sitioWeb,
                 descripcion,
+                industriaId: selectedIndustria,
             }),
         });
-
         const data = await res.json();
-
         if (data.success) {
-            router.push('/auth/login'); // Redirect to the login page after successful registration
+            router.push('/auth/login');
         } else {
             setErrorMessage(data.message || 'Registration failed, please try again.');
         }
@@ -67,116 +89,128 @@ export default function RegisterCompanyPage() {
                 <div className="w-full max-w-md">
                     {step === 1 && (
                         <div>
-                            <h2 className="text-5xl font-bold mb-10 text-gray-800">
-                                Register Your<span className="block mt-4">Company</span>
-                            </h2>
+                            <h2 className="text-5xl font-bold mb-10 text-gray-800">Register Your<span
+                                className="block mt-4">Company</span></h2>
+                            {errorIndustrias && <p className="text-red-500">{errorIndustrias}</p>}
+                            {loadingIndustrias ? <p>Loading industries...</p> : (
+                                <form className="space-y-6" style={{maxHeight: '340px', overflowY: 'auto'}}>
+                                    {/* Todos tus campos de entrada */}
+                                    <div>
+                                        <label htmlFor="industria"
+                                               className="block text-lg font-medium text-gray-700">Industry</label>
+                                        <select
+                                            id="industria"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            value={selectedIndustria}
+                                            onChange={(e) => setSelectedIndustria(e.target.value)}
+                                            required
+                                        >
+                                            <option value="">Select Industry</option>
+                                            {industrias.map((industria) => (
+                                                <option key={industria.id} value={industria.id}>
+                                                    {industria.nombre}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="companyName"
+                                               className="block text-lg font-medium text-gray-700">Company Name</label>
+                                        <input
+                                            type="text"
+                                            id="companyName"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            placeholder="Enter your company name"
+                                            value={companyName}
+                                            onChange={(e) => setCompanyName(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="email"
+                                               className="block text-lg font-medium text-gray-700">Email</label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            placeholder="Enter your company's email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                        />
+                                    </div>
 
+                                    <div>
+                                        <label htmlFor="direccion"
+                                               className="block text-lg font-medium text-gray-700">Address</label>
+                                        <input
+                                            type="text"
+                                            id="direccion"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            placeholder="Enter your address"
+                                            value={direccion}
+                                            onChange={(e) => setDireccion(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="telefono"
+                                               className="block text-lg font-medium text-gray-700">Phone</label>
+                                        <input
+                                            type="text"
+                                            id="telefono"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            placeholder="Enter your phone number"
+                                            value={telefono}
+                                            onChange={(e) => setTelefono(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="sitioWeb"
+                                               className="block text-lg font-medium text-gray-700">Website</label>
+                                        <input
+                                            type="url"
+                                            id="sitioWeb"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            placeholder="Enter your website URL"
+                                            value={sitioWeb}
+                                            onChange={(e) => setSitioWeb(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="descripcion"
+                                               className="block text-lg font-medium text-gray-700">Description</label>
+                                        <textarea
+                                            id="descripcion"
+                                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                            placeholder="Enter your company description"
+                                            value={descripcion}
+                                            onChange={(e) => setDescripcion(e.target.value)}
+                                        />
+                                    </div>
 
-                            <form className="space-y-6" style={{maxHeight: '340px', overflowY: 'auto'}}>
-                            <div>
-                                    <label htmlFor="companyName" className="block text-lg font-medium text-gray-700">Company
-                                        Name</label>
-                                    <input
-                                        type="text"
-                                        id="companyName"
-                                        className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                        placeholder="Enter your company name"
-                                        value={companyName}
-                                        onChange={(e) => setCompanyName(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="direccion"
-                                           className="block text-lg font-medium text-gray-700">Address</label>
-                                    <input
-                                        type="text"
-                                        id="direccion"
-                                        className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                        placeholder="Enter your company's address"
-                                        value={direccion}
-                                        onChange={(e) => setDireccion(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="telefono"
-                                           className="block text-lg font-medium text-gray-700">Phone</label>
-                                    <input
-                                        type="text"
-                                        id="telefono"
-                                        className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                        placeholder="Enter your company's phone number"
-                                        value={telefono}
-                                        onChange={(e) => setTelefono(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="email"
-                                           className="block text-lg font-medium text-gray-700">Email</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                        placeholder="Enter your company's email address"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="sitioWeb"
-                                           className="block text-lg font-medium text-gray-700">Website</label>
-                                    <input
-                                        type="text"
-                                        id="sitioWeb"
-                                        className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                        placeholder="Enter your company's website"
-                                        value={sitioWeb}
-                                        onChange={(e) => setSitioWeb(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="descripcion"
-                                           className="block text-lg font-medium text-gray-700">Description</label>
-                                    <textarea
-                                        id="descripcion"
-                                        className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                        placeholder="Enter a brief description of your company"
-                                        value={descripcion}
-                                        onChange={(e) => setDescripcion(e.target.value)}
-                                    />
-                                </div>
-                            </form>
-
-                            {formError && (
-                                <div className="text-red-600 text-lg mt-6">
-                                    {formError}
-                                </div>
+                                </form>
                             )}
 
-                            <div className="flex justify-between mt-6">
-                                <button
-                                    type="button"
-                                    onClick={handleNextStep}
-                                    className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                    Next
-                                </button>
+                            <div className="text-red-600 text-lg mt-4">
+                                {formError}
                             </div>
-                        </div>
-                    )}
 
+                            <button
+                                type="button"
+                                onClick={handleNextStep}
+                                className="w-full flex justify-center py-4 px-6 mt-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                            >
+                                Next
+                            </button>
+                        </div>
+
+                    )}
                     {step === 2 && (
                         <div>
-                            <h2 className="text-5xl font-bold mb-10 text-gray-800">Register your account</h2>
-                            <form className="space-y-6" onSubmit={handleRegister}>
+                            <h2 className="text-5xl font-bold mb-10 text-gray-800">Register Your User</h2>
+                            <form className="space-y-6">
                                 <div>
                                     <label htmlFor="username"
                                            className="block text-lg font-medium text-gray-700">Username</label>
@@ -190,7 +224,6 @@ export default function RegisterCompanyPage() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label htmlFor="email" className="block text-lg font-medium text-gray-700">Email</label>
                                     <input
@@ -203,7 +236,6 @@ export default function RegisterCompanyPage() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label htmlFor="password" className="block text-lg font-medium text-gray-700">Password</label>
                                     <input
@@ -216,7 +248,6 @@ export default function RegisterCompanyPage() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label htmlFor="phone" className="block text-lg font-medium text-gray-700">Phone</label>
                                     <input
@@ -229,36 +260,30 @@ export default function RegisterCompanyPage() {
                                         required
                                     />
                                 </div>
-
                                 {errorMessage && (
                                     <div className="text-red-600 text-lg">
                                         {errorMessage}
                                     </div>
                                 )}
-
-                                <div className="flex justify-between mt-6">
-                                    <button
-                                        type="button"
-                                        onClick={handlePreviousStep}
-                                        className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        Back
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                                        Register
-                                    </button>
-                                </div>
-
-                                <div className="text-center mt-8">
-                                    <p className="text-lg text-gray-700">Already have an account? <a href="/auth/login" className="text-primary font-medium hover:text-secondary">Log in here.</a></p>
-                                </div>
+                                <button
+                                    type="submit"
+                                    onClick={handleRegister}
+                                    className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                >
+                                    Register
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handlePreviousStep}
+                                    className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                >
+                                    Previous
+                                </button>
                             </form>
                         </div>
                     )}
                 </div>
             </div>
-
             <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/Join_Enterprise.png')" }}></div>
         </div>
     );

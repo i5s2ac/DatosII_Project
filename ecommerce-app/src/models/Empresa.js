@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../lib/sequelize');
-const Industria = require('./Industria'); 
 
 const Empresa = sequelize.define('Empresa', {
     nombre: {
@@ -15,15 +14,14 @@ const Empresa = sequelize.define('Empresa', {
     industriaId: {
         type: DataTypes.INTEGER,
         references: {
-            model: Industria,
+            model: 'Industrias',  // Nombre correcto de la tabla
             key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
     },
 }, {
-    timestamps: true,
     tableName: 'empresas',
 });
 
-export default Empresa;
+module.exports = Empresa;
