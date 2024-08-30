@@ -51,7 +51,8 @@ export default function LoginPage() {
             <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-16">
                 <div className="w-full max-w-md">
                     <h2 className="text-5xl font-bold mb-10 text-gray-800">Welcome back!</h2>
-                    <p className="text-xl text-gray-600 mb-8">Enter your email address and password to access your account.</p>
+                    <p className="text-xl text-gray-600 mb-8">Enter your email address and password to access your
+                        account.</p>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
@@ -68,7 +69,8 @@ export default function LoginPage() {
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-lg font-medium text-gray-700">Password</label>
+                            <label htmlFor="password"
+                                   className="block text-lg font-medium text-gray-700">Password</label>
                             <input
                                 type="password"
                                 id="password"
@@ -94,10 +96,16 @@ export default function LoginPage() {
                             </button>
                         </div>
                     </form>
+                    <div className="text-center mt-8">
+                        <p className="text-lg text-gray-700">Don't have an account? <a href="/auth/register"
+                                                                                       className="text-primary font-medium hover:text-secondary">Register
+                            here.</a></p>
+                    </div>
                 </div>
             </div>
 
-            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}></div>
+            <div className="hidden md:block md:w-1/2 bg-cover bg-center"
+                 style={{backgroundImage: "url('/images/Working.png')"}}></div>
         </div>
     );
 }
