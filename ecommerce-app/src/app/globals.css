@@ -25,6 +25,10 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+body {
+  background-color: #ffffff;
+}
+
 
 @layer utilities {
   .text-balance {
