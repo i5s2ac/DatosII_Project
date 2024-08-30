@@ -12,26 +12,37 @@ export default function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email,
-                password,
-            }),
-        });
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (data.success) {
-            // Almacenar el token en localStorage
-            localStorage.setItem('token', data.token);
-            // Redirigir al usuario a su página específica basada en su userId
-            router.push(`/home/user/${data.userId}`);
-        } else {
-            setErrorMessage('Login failed, please try again.');
+            if (data.success) {
+                // Almacenar el token en localStorage
+                localStorage.setItem('token', data.token);
+
+                // Redirigir al usuario a su página específica si tiene un rolId
+                if (data.rolId) {
+                    router.push(`/home/user/${data.userId}/${data.empresaId}/${data.rolId}`);
+                } else {
+                    // Si no tiene un rol, redirige a una ruta por defecto o a la página principal
+                    router.push(`/home/user/${data.userId}`);
+                }
+            } else {
+                setErrorMessage('Login failed, please try again.');
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            setErrorMessage('An error occurred. Please try again.');
         }
     };
 
@@ -39,7 +50,7 @@ export default function LoginPage() {
         <div className="min-h-screen flex">
             <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-16">
                 <div className="w-full max-w-md">
-                    <h2 className="text-5xl font-bold mb-10 text-gray-800">¡Welcome Back!</h2>
+                    <h2 className="text-5xl font-bold mb-10 text-gray-800">Welcome back!</h2>
                     <p className="text-xl text-gray-600 mb-8">Enter your email address and password to access your account.</p>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -82,15 +93,11 @@ export default function LoginPage() {
                                 Log In
                             </button>
                         </div>
-
-                        <div className="text-center mt-8">
-                            <p className="text-lg text-gray-700">Don't have an account? <a href="/auth/register" className="text-primary font-medium hover:text-secondary">Register here.</a></p>
-                        </div>
                     </form>
                 </div>
             </div>
 
-            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/Working.png')" }}></div>
+            <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/images/MousePad.jpg')" }}></div>
         </div>
     );
 }

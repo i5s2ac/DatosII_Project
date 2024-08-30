@@ -160,7 +160,7 @@ export default function UserPage({ params }) {
                             value={searchQuery}
                             onChange={handleSearchChange}
                             placeholder="Search for jobs, companies..."
-                            className="w-full px-4 py-3 text-gray-700 placeholder-gray-500 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-6 py-3 text-gray-700 placeholder-gray-500 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button
                             onClick={handleSearchSubmit}
