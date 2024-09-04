@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../lib/sequelize');
 const Empresa = require('./Empresa');
+const User = require('./User');  // Asumiendo que tienes un modelo de Usuario
 
 const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
     titulo: {
@@ -18,11 +19,18 @@ const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
             model: Empresa,
             key: 'id',
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        allowNull: false,
     },
+    userId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: User,  // Referencia al modelo de usuario
+            key: 'id',
+        },
+        allowNull: false,
+    }
 }, {
     tableName: 'ofertas_empleos',
 });
 
-export default OfertaEmpleo;
+module.exports = OfertaEmpleo;

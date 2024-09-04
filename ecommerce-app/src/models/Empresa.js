@@ -14,7 +14,7 @@ const Empresa = sequelize.define('Empresa', {
     industriaId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Industrias',  // Nombre correcto de la tabla
+            model: 'industrias',  // Nombre de la tabla referenciada
             key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -23,5 +23,14 @@ const Empresa = sequelize.define('Empresa', {
 }, {
     tableName: 'empresas',
 });
+
+// Sincroniza el modelo con la base de datos
+sequelize.sync()
+    .then(() => {
+        console.log('Tabla "empresas" sincronizada correctamente.');
+    })
+    .catch(error => {
+        console.error('Error al sincronizar la tabla "empresas":', error);
+    });
 
 module.exports = Empresa;
