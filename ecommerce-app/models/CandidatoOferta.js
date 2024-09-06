@@ -1,7 +1,8 @@
+// models/CandidatoOferta.js
 import { DataTypes } from 'sequelize';
-import sequelize from '../lib/sequelize';
-const User = require('./User');
-const OfertaEmpleo = require('./OfertaEmpleo');
+const sequelize = require('../src/lib/sequelize');
+import User from './user';  // Asegúrate de que User.js use export default
+import OfertaEmpleo from './ofertaempleo';  // Asegúrate de que OfertaEmpleo.js use export default
 
 const CandidatoOferta = sequelize.define('CandidatoOferta', {
     estado: {
@@ -28,7 +29,7 @@ const CandidatoOferta = sequelize.define('CandidatoOferta', {
     },
 }, {
     timestamps: true,
-    tableName: 'Candidato_Oferta'
+    tableName: 'Candidato_Oferta',
 });
 
 export default CandidatoOferta;

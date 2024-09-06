@@ -1,9 +1,9 @@
 import sequelize from '@/lib/sequelize';
-import Empresa from '@/models/Empresa';
-import User from '@/models/User';
-import Industria from '@/models/Industria';
-import EmpresaUsuario from '@/models/EmpresaUsuario';
-import Rol from '@/models/Rol';
+import Empresa from '../../models/Empresa';
+import User from '../../models/user';
+import Industria from '../../models/Industria';
+import EmpresaUsuario from '../../models/EmpresaUsuario';
+import Rol from '../../models/rol';
 import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {

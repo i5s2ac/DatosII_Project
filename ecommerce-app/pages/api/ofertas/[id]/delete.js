@@ -1,4 +1,4 @@
-import OfertaEmpleo from '@/models/OfertaEmpleo';
+import OfertaEmpleo from '../../../../models/ofertaempleo';
 
 export default async function handler(req, res) {
     const { id } = req.query;

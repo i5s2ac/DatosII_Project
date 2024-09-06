@@ -1,7 +1,8 @@
+// models/HistorialAplicaciones.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../lib/sequelize');
-const User = require('./User');
-const OfertaEmpleo = require('./OfertaEmpleo');
+const sequelize = require('../src/lib/sequelize');
+const User = require('./user');
+const OfertaEmpleo = require('./ofertaempleo');
 
 const HistorialAplicaciones = sequelize.define('HistorialAplicaciones', {
     fechaAplicacion: {
@@ -10,8 +11,7 @@ const HistorialAplicaciones = sequelize.define('HistorialAplicaciones', {
     },
     estadoAplicacion: {
         type: DataTypes.ENUM('pendiente', 'en proceso', 'aceptada', 'rechazada'),
-        allowNull
-        : false,
+        allowNull: false,
     },
     usuarioId: {
         type: DataTypes.INTEGER,

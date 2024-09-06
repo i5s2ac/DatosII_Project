@@ -1,6 +1,6 @@
 import sequelize from '@/lib/sequelize';
-import User from '@/models/User';
-import EmpresaUsuario from '@/models/EmpresaUsuario';
+import User from '../../models/user';
+import EmpresaUsuario from '../../models/EmpresaUsuario';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 

@@ -1,4 +1,4 @@
-import Industria from '@/models/Industria';
+import Industria from '../../models/Industria';
 import sequelize from '@/lib/sequelize';
 
 export default async function handler(req, res) {

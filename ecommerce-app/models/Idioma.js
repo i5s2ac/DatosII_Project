@@ -1,8 +1,9 @@
+// models/Idioma.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../lib/sequelize');
-const PerfilUsuario = require('./PerfilUsuario');
+const sequelize = require('../src/lib/sequelize');
+const Usuario = require('./user');
 
-const Skill = sequelize.define('Skill', {
+const Idioma = sequelize.define('Idioma', {
     nombre: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -11,18 +12,17 @@ const Skill = sequelize.define('Skill', {
         type: DataTypes.ENUM('básico', 'intermedio', 'avanzado', 'experto'),
         allowNull: false,
     },
-    descripcion: DataTypes.TEXT,
-    perfilUsuarioId: {
+    usuarioId: {
         type: DataTypes.INTEGER,
         references: {
-            model: PerfilUsuario,
+            model: Usuario,
             key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
     },
 }, {
-    tableName: 'Skills',
+    tableName: 'idiomas',
 });
 
-module.exports = Skill;
+module.exports = Idioma;

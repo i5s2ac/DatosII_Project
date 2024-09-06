@@ -1,6 +1,6 @@
 // models/Industria.js
 import { DataTypes } from 'sequelize';
-import sequelize from '../lib/sequelize';
+const sequelize = require('../src/lib/sequelize');
 
 const Industria = sequelize.define('Industria', {
     nombre: {

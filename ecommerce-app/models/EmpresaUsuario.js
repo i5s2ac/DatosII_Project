@@ -1,8 +1,9 @@
+// models/EmpresaUsuario.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../lib/sequelize');
+const sequelize = require('../src/lib/sequelize');
 const Empresa = require('./Empresa');
-const User = require('./User');
-const Rol = require('./Rol');
+const User = require('./user');
+const Rol = require('./rol');
 
 const EmpresaUsuario = sequelize.define('EmpresaUsuario', {
     empresaId: {
@@ -26,7 +27,7 @@ const EmpresaUsuario = sequelize.define('EmpresaUsuario', {
     rolId: {
         type: DataTypes.INTEGER,
         references: {
-            model: Rol,  // Aquí debe estar el modelo correcto
+            model: Rol, // Verifica que el modelo Rol esté correctamente definido
             key: 'id',
         },
         onUpdate: 'CASCADE',

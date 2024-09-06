@@ -1,4 +1,4 @@
-import Product from '@/models/CandidatoOferta';
+import Product from '../../models/CandidatoOferta';
 import sequelize from '@/lib/sequelize';
 
 export default async function handler(req, res) {

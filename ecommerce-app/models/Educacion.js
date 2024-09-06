@@ -1,16 +1,25 @@
+// models/Educacion.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../lib/sequelize');
-const PerfilUsuario = require('./PerfilUsuario');
+const sequelize = require('../src/lib/sequelize');
+const PerfilUsuario = require('./perfilusuario');
 
 const Educacion = sequelize.define('Educacion', {
     institucion: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    gradoObtenido: DataTypes.STRING,
-    campoEstudio: DataTypes.STRING,
-    fechaInicio: DataTypes.DATE,
-    fechaFin: DataTypes.DATE,
+    gradoObtenido: {
+        type: DataTypes.STRING,
+    },
+    campoEstudio: {
+        type: DataTypes.STRING,
+    },
+    fechaInicio: {
+        type: DataTypes.DATE,
+    },
+    fechaFin: {
+        type: DataTypes.DATE,
+    },
     perfilUsuarioId: {
         type: DataTypes.INTEGER,
         references: {
