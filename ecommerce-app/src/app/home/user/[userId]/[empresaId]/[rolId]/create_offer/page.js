@@ -3,6 +3,7 @@
 import Layout from '../../../../../../components/Layout';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 
 export default function CreateOfferPage({ params }) {
     const { userId, empresaId, rolId } = params;
@@ -15,8 +16,12 @@ export default function CreateOfferPage({ params }) {
         salario: '',
         fechaPublicacion: '',
         fechaCierre: '',
-        empresaId: empresaId || '', // Esto debería estar asociado con la empresa actual del usuario
+        empresaId: empresaId || '',
+        userId: userId || "",
     });
+
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState(''); // 'success' o 'error'
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -29,34 +34,60 @@ export default function CreateOfferPage({ params }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const res = await fetch('/api/ofertas/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(offerData),
-        });
+        try {
+            const res = await fetch('/api/ofertas/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(offerData),
+            });
 
-        if (res.ok) {
-            router.push(`/home/user/${userId}/${empresaId}/${rolId}/create_offer`);
-        } else {
-            console.error('Error creating job offer');
+            if (res.ok) {
+                setMessage('Oferta creada exitosamente.');
+                setMessageType('success');
+                setTimeout(() => {
+                    router.back();
+                }, 2000); // Redirige después de 2 segundos
+            } else {
+                throw new Error('Error al crear la oferta.');
+            }
+        } catch (error) {
+            setMessage('Hubo un error al crear la oferta. Por favor, intenta de nuevo.');
+            setMessageType('error');
+            setTimeout(() => {
+                setMessage('');
+            }, 3000); // Limpia el mensaje después de 3 segundos
         }
     };
 
     return (
         <Layout userId={userId} empresaId={empresaId} rolId={rolId}>
-            <div className="max-w-8xl mx-auto p-6 bg-white shadow-md rounded-lg">
-                <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Mostrar mensaje de éxito o error */}
+            {message && (
+                <div className={`mt-4 p-4 rounded-md ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {message}
+                </div>
+            )}
+            <div className="max-w-8xl mx-auto p-6 bg-white rounded-lg">
+                <div className="flex items-center mb-6">
+                    <ArrowLeftIcon
+                        className="h-6 w-6 text-gray-700 cursor-pointer hover:text-primary transition"
+                        onClick={() => router.back()}
+                    />
+                    <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">Crear oferta de trabajo</h2>
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="titulo" className="block text-lg font-medium text-gray-700">Título</label>
                         <input
                             type="text"
                             id="titulo"
                             name="titulo"
-                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.titulo}
                             onChange={handleChange}
+                            placeholder="Ej. Desarrollador Full Stack"
                             required
                         />
                     </div>
@@ -66,9 +97,10 @@ export default function CreateOfferPage({ params }) {
                         <textarea
                             id="descripcion"
                             name="descripcion"
-                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.descripcion}
                             onChange={handleChange}
+                            placeholder="Describe las responsabilidades del puesto..."
                             required
                         />
                     </div>
@@ -79,9 +111,10 @@ export default function CreateOfferPage({ params }) {
                             type="text"
                             id="ubicacion"
                             name="ubicacion"
-                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.ubicacion}
                             onChange={handleChange}
+                            placeholder="Ej. Ciudad de Guatemala, Remoto"
                             required
                         />
                     </div>
@@ -92,9 +125,10 @@ export default function CreateOfferPage({ params }) {
                             type="number"
                             id="salario"
                             name="salario"
-                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.salario}
                             onChange={handleChange}
+                            placeholder="Ej. 50000"
                             required
                         />
                     </div>
@@ -105,7 +139,7 @@ export default function CreateOfferPage({ params }) {
                             type="date"
                             id="fechaPublicacion"
                             name="fechaPublicacion"
-                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.fechaPublicacion}
                             onChange={handleChange}
                             required
@@ -118,7 +152,7 @@ export default function CreateOfferPage({ params }) {
                             type="date"
                             id="fechaCierre"
                             name="fechaCierre"
-                            className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.fechaCierre}
                             onChange={handleChange}
                             required
