@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../src/lib/sequelize');
 const Empresa = require('./Empresa');
+const User = require('./User');  // Asegúrate de tener este modelo importado
 
 const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
   titulo: {
@@ -20,6 +21,16 @@ const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
     },
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
+  },
+  userId: {  // Nueva columna para hacer referencia al creador de la oferta
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,  // Referencia al modelo de User
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+    allowNull: false,  // Asegúrate de que no sea nulo
   },
 }, {
   tableName: 'ofertas_empleos',
