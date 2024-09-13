@@ -1,18 +1,17 @@
 "use client";
 
-import Layout from '../../../../../../components/Layout';
+import Layout from '../../../../../../../../components/Layout';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-export default function CreateOfferPage({ params }) {
-    const { userId, empresaId, rolId } = params;
+export default function EditOfferPage({ params }) {
+    const { userId, empresaId, rolId, offerId } = params;
     const router = useRouter();
-
     const [offerData, setOfferData] = useState({
         titulo: '',
         descripcion: '',
@@ -23,6 +22,39 @@ export default function CreateOfferPage({ params }) {
         empresaId: empresaId || '',
         userId: userId || "",
     });
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';  // Si no hay fecha, retornamos un string vacío
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Los meses empiezan en 0
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Fetch the existing offer data on component mount
+    useEffect(() => {
+        const fetchOfferData = async () => {
+            try {
+                const res = await fetch(`/api/ofertas/${offerId}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setOfferData(data.oferta);  // Carga los datos existentes en el formulario
+                } else {
+                    throw new Error('Error al cargar los datos de la oferta');
+                }
+            } catch (error) {
+                MySwal.fire({
+                    title: 'Error',
+                    text: 'Hubo un error al cargar los datos de la oferta',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+            }
+        };
+
+        if (offerId) fetchOfferData();  // Solo llama a la función si el 'offerId' está presente
+    }, [offerId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -36,8 +68,8 @@ export default function CreateOfferPage({ params }) {
         e.preventDefault();
 
         try {
-            const res = await fetch('/api/ofertas/create', {
-                method: 'POST',
+            const res = await fetch(`/api/ofertas/${offerId}/update`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -45,9 +77,9 @@ export default function CreateOfferPage({ params }) {
             });
 
             if (res.ok) {
-                // Mostrar SweetAlert2 para el éxito
                 MySwal.fire({
-                    title: '¡Oferta creada exitosamente!',
+                    title: '¡Oferta actualizada!',
+                    text: 'La oferta ha sido actualizada exitosamente.',
                     icon: 'success',
                     showConfirmButton: false,
                     timer: 1500
@@ -56,13 +88,12 @@ export default function CreateOfferPage({ params }) {
                     router.back();
                 }, 1500); // Redirige después de 1.5 segundos
             } else {
-                throw new Error('Error al crear la oferta.');
+                throw new Error('Error al actualizar la oferta.');
             }
         } catch (error) {
-            // Mostrar SweetAlert2 para el error
             MySwal.fire({
                 title: 'Error',
-                text: 'Hubo un error al crear la oferta. Por favor, intenta de nuevo.',
+                text: 'Hubo un error al actualizar la oferta. Por favor, intenta de nuevo.',
                 icon: 'error',
                 confirmButtonText: 'Entendido'
             });
@@ -77,7 +108,7 @@ export default function CreateOfferPage({ params }) {
                         className="h-6 w-6 text-gray-700 cursor-pointer hover:text-primary transition"
                         onClick={() => router.back()}
                     />
-                    <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">Crear oferta de trabajo</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">Editar oferta de trabajo</h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -142,7 +173,7 @@ export default function CreateOfferPage({ params }) {
                             id="fechaPublicacion"
                             name="fechaPublicacion"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.fechaPublicacion}
+                            value={formatDate(offerData.fechaPublicacion)}
                             onChange={handleChange}
                             required
                         />
@@ -155,7 +186,7 @@ export default function CreateOfferPage({ params }) {
                             id="fechaCierre"
                             name="fechaCierre"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.fechaCierre}
+                            value={formatDate(offerData.fechaCierre)}
                             onChange={handleChange}
                             required
                         />
@@ -165,7 +196,7 @@ export default function CreateOfferPage({ params }) {
                         type="submit"
                         className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                     >
-                        Crear Oferta
+                        Actualizar Oferta
                     </button>
                 </form>
             </div>

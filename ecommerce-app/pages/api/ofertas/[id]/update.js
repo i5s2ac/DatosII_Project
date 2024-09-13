@@ -1,25 +1,33 @@
 import OfertaEmpleo from '../../../../models/ofertaempleo';
 
 export default async function handler(req, res) {
-    const { id } = req.query;
+    const { id } = req.query;  // Asegúrate de usar 'id'
 
     if (req.method === 'PUT') {
-        const { titulo, descripcion, ubicacion, salario, fechaPublicacion, fechaCierre } = req.body;
-
         try {
             const oferta = await OfertaEmpleo.findByPk(id);
 
             if (!oferta) {
-                return res.status(404).json({ success: false, message: 'Job offer not found' });
+                return res.status(404).json({ success: false, message: 'Oferta no encontrada' });
             }
 
-            await oferta.update({ titulo, descripcion, ubicacion, salario, fechaPublicacion, fechaCierre });
+            const { titulo, descripcion, ubicacion, salario, fechaPublicacion, fechaCierre } = req.body;
+
+            oferta.titulo = titulo || oferta.titulo;
+            oferta.descripcion = descripcion || oferta.descripcion;
+            oferta.ubicacion = ubicacion || oferta.ubicacion;
+            oferta.salario = salario || oferta.salario;
+            oferta.fechaPublicacion = fechaPublicacion || oferta.fechaPublicacion;
+            oferta.fechaCierre = fechaCierre || oferta.fechaCierre;
+
+            await oferta.save();
+
             res.status(200).json({ success: true, oferta });
         } catch (error) {
-            console.error('Error updating job offer:', error);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            console.error('Error updating offer:', error);
+            res.status(500).json({ success: false, message: 'Error actualizando la oferta' });
         }
     } else {
-        res.status(405).json({ success: false, message: 'Method not allowed' });
+        res.status(405).json({ success: false, message: 'Método no permitido' });
     }
 }

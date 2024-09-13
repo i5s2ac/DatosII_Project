@@ -7,6 +7,10 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 export default function UserPage({ params }) {
     const { userId, empresaId, rolId } = params;
@@ -93,7 +97,42 @@ export default function UserPage({ params }) {
         )
         .filter((offer) =>
             typeFilter ? offer.tipo.includes(typeFilter) : true
-        );
+        )
+
+    // Función para eliminar una oferta con SweetAlert2
+    const handleDeleteOffer = async (offerId) => {
+        MySwal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Recuerda que no podrás revertir esta acción!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/ofertas/${offerId}/delete`, {
+                        method: 'DELETE',
+                    });
+                    if (res.ok) {
+                        // Si la oferta se eliminó con éxito, actualiza la lista de ofertas
+                        setJobOffers((prevOffers) => prevOffers.filter(offer => offer.id !== offerId));
+                        Swal.fire(
+                            '¡Eliminado!',
+                            'La oferta ha sido eliminada.',
+                            'success'
+                        );
+                    } else {
+                        throw new Error('Error al eliminar la oferta');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', `Hubo un error al eliminar la oferta: ${error.message}`, 'error');
+                }
+            }
+        });
+    };
 
     const settings = {
         dots: true,
@@ -259,12 +298,20 @@ export default function UserPage({ params }) {
                                                 </div>
                                             </div>
                                             <div className="flex space-x-2">
-                                                <button className="text-blue-600 hover:text-blue-800 transition">
-                                                    <PencilIcon className="h-5 w-5" />
+                                                <button
+                                                    onClick={() => router.push(`/home/user/${userId}/${empresaId}/${rolId}/offers/edit/${offer.id}`)}
+                                                    className="text-blue-600 hover:text-blue-800 transition"
+                                                >
+                                                    <PencilIcon className="h-5 w-5"/>
                                                 </button>
-                                                <button className="text-red-600 hover:text-red-800 transition">
-                                                    <TrashIcon className="h-5 w-5" />
-                                                </button>
+
+                                                <button
+                                                onClick={() => handleDeleteOffer(offer.id)}  // Aquí se llama a la función de eliminación
+                                                className="text-red-600 hover:text-red-800 transition"
+                                                >
+                                                <TrashIcon className="h-5 w-5"/>
+                                            </button>
+
                                             </div>
                                         </div>
                                         <h3 className="text-xl font-bold text-gray-900 mt-4">
