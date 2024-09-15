@@ -32,8 +32,13 @@ const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
     onDelete: 'CASCADE',
     allowNull: false,  // Asegúrate de que no sea nulo
   },
+  estatus: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'Activo',  // Valor por defecto
+  },
 }, {
   tableName: 'ofertas_empleos',
 });
 
-export default OfertaEmpleo;
+module.exports = OfertaEmpleo;

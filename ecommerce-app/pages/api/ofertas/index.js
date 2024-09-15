@@ -24,7 +24,17 @@ export default async function handler(req, res) {
                     return res.status(404).json({ success: false, message: 'No job offers found for this company' });
                 }
 
-                res.status(200).json({ success: true, ofertas });
+                // Contar cuántas plazas están activas e inactivas
+                const plazasActivas = ofertas.filter(oferta => oferta.estatus === 'Activo').length;
+                const plazasInactivas = ofertas.filter(oferta => oferta.estatus === 'Inactivo').length;
+
+                // Devolver el resultado junto con las ofertas
+                res.status(200).json({
+                    success: true,
+                    ofertas,
+                    plazasActivas,
+                    plazasInactivas
+                });
             } else {
                 res.status(400).json({ success: false, message: 'Missing empresaId in query' });
             }

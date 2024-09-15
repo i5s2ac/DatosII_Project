@@ -37,6 +37,21 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      userId: {  // Agrega la referencia al usuario
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',  // Asegúrate de que el nombre de la tabla coincida con el de Usuario
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+        allowNull: false
+      },
+      estatus: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'Activo'  // Valor por defecto "Activo"
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

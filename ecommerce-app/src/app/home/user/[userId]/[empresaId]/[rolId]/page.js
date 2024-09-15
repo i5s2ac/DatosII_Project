@@ -25,26 +25,11 @@ export default function UserPage({ params }) {
     const [typeFilter, setTypeFilter] = useState("");
     const [userOfferCount, setUserOfferCount] = useState(0);
     const [companyOfferCount, setCompanyOfferCount] = useState(0);
-    const [activeJobCount, setActiveJobCount] = useState(12); // Plazas activas
-    const [inactiveJobCount, setInactiveJobCount] = useState(5); // Plazas inactivas
+    const [activeJobCount, setActiveJobCount] = useState(0);
+    const [inactiveJobCount, setInactiveJobCount] = useState(0);
     const [activeTab, setActiveTab] = useState("pending"); // Controla la pestaña activa
 
-    // Plazas ficticias
-    const activeJobs = [
-        { id: 1, title: "Desarrollador Frontend", date: "Hace 2 días" },
-        { id: 2, title: "Diseñador UI/UX", date: "Hace 4 días" },
-        { id: 3, title: "Gerente de Proyecto", date: "Hace 5 días" },
-        { id: 4, title: "DevOps", date: "Hace 6 días" },
-        { id: 5, title: "Analista de Datos", date: "Hace 7 días" },
-    ];
 
-    const inactiveJobs = [
-        { id: 1, title: "Diseñador Gráfico", date: "Hace 10 días" },
-        { id: 2, title: "Backend Developer", date: "Hace 12 días" },
-        { id: 3, title: "Marketing Manager", date: "Hace 15 días" },
-        { id: 4, title: "SEO Specialist", date: "Hace 20 días" },
-        { id: 5, title: "Administrador de Sistemas", date: "Hace 25 días" },
-    ];
     const router = useRouter();
 
     const handleCreateOfferClick = () => {
@@ -195,14 +180,14 @@ export default function UserPage({ params }) {
                 if (data.success) {
                     setJobOffers(data.ofertas);
 
-                    // Contar cuántas ofertas son del usuario y cuántas de la empresa
-                    const userOffers = data.ofertas.filter(
-                        (offer) => offer.userId === parseInt(userId)
-                    );
-                    setUserOfferCount(userOffers.length);
-                    setCompanyOfferCount(data.ofertas.length);
+                    // Contar cuántas ofertas están activas e inactivas
+                    const activeOffers = data.ofertas.filter(offer => offer.estatus === "Activo");
+                    const inactiveOffers = data.ofertas.filter(offer => offer.estatus === "Inactivo");
+
+                    setActiveJobCount(activeOffers.length);
+                    setInactiveJobCount(inactiveOffers.length);
                 } else {
-                    console.error("Failed to fetch job offers:", data.message);
+                    console.error("No se encontraron ofertas");
                 }
             } catch (error) {
                 console.error("Error fetching job offers:", error);
@@ -268,6 +253,41 @@ export default function UserPage({ params }) {
             }
         });
     };
+
+    const handleToggleStatus = async (offerId, currentStatus) => {
+        try {
+            const token = localStorage.getItem('token');
+            const newStatus = currentStatus === 'Activo' ? 'Inactivo' : 'Activo';
+
+            const res = await fetch(`/api/ofertas/${offerId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ estatus: newStatus }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.reload();  // Recargar la página si la acción fue exitosa
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Error al cambiar el estatus:', error);
+        }
+    };
+
+    const calcularDiasDesdePublicacion = (fechaPublicacion) => {
+        const ahora = new Date();
+        const fechaPublicacionDate = new Date(fechaPublicacion);
+        const diferenciaTiempo = ahora - fechaPublicacionDate; // Diferencia en milisegundos
+        const diferenciaDias = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)); // Convertir a días
+        return diferenciaDias;
+    };
+
 
     const settings = {
         dots: true,
@@ -367,10 +387,8 @@ export default function UserPage({ params }) {
                         </button>
                     </div>
 
-
                     {/* Tarjeta de Plazas Activas */}
-                    <div
-                        className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300 relative">
+                    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300 relative">
                         <div className="flex items-center space-x-4 mb-4">
                             <div className="bg-green-500 rounded-full h-12 w-12 flex items-center justify-center">
                                 <span className="text-white text-xl font-bold">{activeJobCount}</span>
@@ -383,10 +401,11 @@ export default function UserPage({ params }) {
 
                         {/* Lista de plazas activas */}
                         <div className="overflow-y-auto max-h-40">
-                            {activeJobs.map((job) => (
+                            {jobOffers.filter(offer => offer.estatus === 'Activo').map((job) => (
                                 <div key={job.id} className="mb-3">
-                                    <p className="text-gray-800 font-medium">{job.title}</p>
-                                    <p className="text-gray-500 text-sm">{job.date}</p>
+                                    <p className="text-gray-800 font-medium">{job.titulo}</p>
+                                    <p className="text-gray-500 text-sm">Publicado
+                                        hace {calcularDiasDesdePublicacion(job.fechaPublicacion)} días</p>
                                 </div>
                             ))}
                         </div>
@@ -401,8 +420,7 @@ export default function UserPage({ params }) {
                     </div>
 
                     {/* Tarjeta de Plazas Inactivas */}
-                    <div
-                        className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl border border-gray-200 transition-shadow duration-300 relative">
+                    <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl border border-gray-200 transition-shadow duration-300 relative">
                         <div className="flex items-center space-x-4 mb-4">
                             <div className="bg-red-500 rounded-full h-12 w-12 flex items-center justify-center">
                                 <span className="text-white text-xl font-bold">{inactiveJobCount}</span>
@@ -415,11 +433,11 @@ export default function UserPage({ params }) {
 
                         {/* Lista de plazas inactivas */}
                         <div className="overflow-y-auto max-h-40">
-                            {inactiveJobs.map((job) => (
+                            {jobOffers.filter(offer => offer.estatus === 'Inactivo').map((job) => (
                                 <div key={job.id} className="mb-3">
-                                    <p className="text-gray-800 font-medium">{job.title}</p>
-                                    <p className="text-gray-500 text-sm">{job.date}</p>
-                                </div>
+                                    <p className="text-gray-800 font-medium">{job.titulo}</p>
+                                    <p className="text-gray-500 text-sm">Publicado
+                                        hace {calcularDiasDesdePublicacion(job.fechaPublicacion)} días</p>                                </div>
                             ))}
                         </div>
 
@@ -431,6 +449,10 @@ export default function UserPage({ params }) {
                             Ver todas las plazas inactivas
                         </button>
                     </div>
+
+
+
+
                 </div>
 
 
@@ -609,10 +631,14 @@ export default function UserPage({ params }) {
                                                         className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                                         Revisar Candidatos
                                                     </button>
-                                                    <button onClick={() => handleToggleStatus(offer.id)}
-                                                            className={`px-4 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${offer.status === "active" ? "bg-red-600 text-white hover:bg-red-700" : "bg-green-600 text-white hover:bg-green-700"}`}>
-                                                        {offer.status === "active" ? "Desactivar Trabajo" : "Activar Trabajo"}
+                                                    <button
+                                                        onClick={() => handleToggleStatus(offer.id, offer.estatus)}
+                                                        className={`px-4 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${offer.estatus === "Activo" ? "bg-red-600 text-white hover:bg-red-700" : "bg-green-600 text-white hover:bg-green-700"}`}
+                                                    >
+                                                        {offer.estatus === "Activo" ? "Desactivar Trabajo" : "Activar Trabajo"}
                                                     </button>
+
+
                                                 </div>
                                             </div>
                                         </div>
@@ -625,7 +651,7 @@ export default function UserPage({ params }) {
                         {/* Tabla de Candidatos - Derecha */}
                         <div className="w-full md:w-2/3 pl-4 ">
 
-                            <h2 className="text-2xl font-semibold text-gray-800 mt-8 ">Candidatos</h2>
+                        <h2 className="text-2xl font-semibold text-gray-800 mt-8 ">Candidatos</h2>
 
                             <div className="bg-white p-6 rounded-lg shadow-lg mt-6 border border-gray-200 ">
                                 {/* Pestañas */}

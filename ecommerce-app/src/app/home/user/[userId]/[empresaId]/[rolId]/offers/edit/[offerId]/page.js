@@ -19,6 +19,7 @@ export default function EditOfferPage({ params }) {
         salario: '',
         fechaPublicacion: '',
         fechaCierre: '',
+        estatus: '',
         empresaId: empresaId || '',
         userId: userId || "",
     });
@@ -126,7 +127,8 @@ export default function EditOfferPage({ params }) {
                     </div>
 
                     <div>
-                        <label htmlFor="descripcion" className="block text-lg font-medium text-gray-700">Descripción</label>
+                        <label htmlFor="descripcion"
+                               className="block text-lg font-medium text-gray-700">Descripción</label>
                         <textarea
                             id="descripcion"
                             name="descripcion"
@@ -167,7 +169,8 @@ export default function EditOfferPage({ params }) {
                     </div>
 
                     <div>
-                        <label htmlFor="fechaPublicacion" className="block text-lg font-medium text-gray-700">Fecha de Publicación</label>
+                        <label htmlFor="fechaPublicacion" className="block text-lg font-medium text-gray-700">Fecha de
+                            Publicación</label>
                         <input
                             type="date"
                             id="fechaPublicacion"
@@ -180,7 +183,8 @@ export default function EditOfferPage({ params }) {
                     </div>
 
                     <div>
-                        <label htmlFor="fechaCierre" className="block text-lg font-medium text-gray-700">Fecha de Cierre</label>
+                        <label htmlFor="fechaCierre" className="block text-lg font-medium text-gray-700">Fecha de
+                            Cierre</label>
                         <input
                             type="date"
                             id="fechaCierre"
@@ -191,6 +195,22 @@ export default function EditOfferPage({ params }) {
                             required
                         />
                     </div>
+
+                    <div>
+                        <label htmlFor="estatus" className="block text-lg font-medium text-gray-700">Estatus</label>
+                        <select
+                            id="estatus"
+                            name="estatus"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            value={offerData.estatus}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
 
                     <button
                         type="submit"

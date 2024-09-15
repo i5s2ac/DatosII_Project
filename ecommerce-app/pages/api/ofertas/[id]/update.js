@@ -11,7 +11,7 @@ export default async function handler(req, res) {
                 return res.status(404).json({ success: false, message: 'Oferta no encontrada' });
             }
 
-            const { titulo, descripcion, ubicacion, salario, fechaPublicacion, fechaCierre } = req.body;
+            const { titulo, descripcion, ubicacion, salario, fechaPublicacion, fechaCierre,estatus } = req.body;
 
             oferta.titulo = titulo || oferta.titulo;
             oferta.descripcion = descripcion || oferta.descripcion;
@@ -19,6 +19,8 @@ export default async function handler(req, res) {
             oferta.salario = salario || oferta.salario;
             oferta.fechaPublicacion = fechaPublicacion || oferta.fechaPublicacion;
             oferta.fechaCierre = fechaCierre || oferta.fechaCierre;
+            oferta.estatus = estatus || oferta.estatus;
+
 
             await oferta.save();
 
