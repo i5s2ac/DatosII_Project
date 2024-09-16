@@ -156,28 +156,51 @@ export default function EditOfferPage({ params }) {
                         className="h-6 w-6 text-gray-700 cursor-pointer hover:text-primary transition"
                         onClick={() => router.back()}
                     />
-                    <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">Editar oferta de trabajo</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">
+                        Actualizar oferta de trabajo
+                    </h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Campos del formulario similares al de creación */}
-                    {/* Título */}
-                    <div>
-                        <label htmlFor="titulo" className="block text-lg font-medium text-gray-700">Título</label>
-                        <input
-                            type="text"
-                            id="titulo"
-                            name="titulo"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.titulo}
-                            onChange={handleChange}
-                            placeholder="Ej. Desarrollador Full Stack"
-                            required
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label htmlFor="titulo" className="block text-lg font-medium text-gray-700">
+                                Título
+                            </label>
+                            <input
+                                type="text"
+                                id="titulo"
+                                name="titulo"
+                                maxLength="100"
+                                className="block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.titulo}
+                                onChange={handleChange}
+                                placeholder="Ej. Desarrollador Full Stack"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="ubicacion" className="block text-lg font-medium text-gray-700">
+                                Ubicación
+                            </label>
+                            <input
+                                type="text"
+                                id="ubicacion"
+                                name="ubicacion"
+                                maxLength="100"
+                                className="block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.ubicacion}
+                                onChange={handleChange}
+                                placeholder="Ej. Ciudad de Guatemala"
+                                required
+                            />
+                        </div>
                     </div>
 
-                    {/* Descripción */}
                     <div>
-                        <label htmlFor="descripcion" className="block text-lg font-medium text-gray-700">Descripción (255 caracteres)</label>
+                        <label htmlFor="descripcion" className="block text-lg font-medium text-gray-700">
+                            Descripción (máximo 255 caracteres)
+                        </label>
                         <textarea
                             id="descripcion"
                             name="descripcion"
@@ -190,28 +213,16 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
-                    {/* Ubicación */}
                     <div>
-                        <label htmlFor="ubicacion" className="block text-lg font-medium text-gray-700">Ubicación</label>
-                        <input
-                            type="text"
-                            id="ubicacion"
-                            name="ubicacion"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.ubicacion}
-                            onChange={handleChange}
-                            placeholder="Ej. Ciudad de Guatemala, Remoto"
-                            required
-                        />
-                    </div>
-
-                    {/* Salario */}
-                    <div>
-                        <label htmlFor="salario" className="block text-lg font-medium text-gray-700">Salario</label>
+                        <label htmlFor="salario" className="block text-lg font-medium text-gray-700">
+                            Salario
+                        </label>
                         <input
                             type="number"
                             id="salario"
                             name="salario"
+                            min="0"
+                            max="1000000"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.salario}
                             onChange={handleChange}
@@ -220,68 +231,75 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
-                    {/* Tags */}
                     <div>
                         <label className="block text-lg font-medium text-gray-700">Tags (Máximo 3)</label>
-                        {[0, 1, 2].map((index) => (
+                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            {[0, 1, 2].map((index) => (
+                                <input
+                                    key={index}
+                                    type="text"
+                                    name={`tag-${index}`}
+                                    maxLength="50"
+                                    className="block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                    value={offerData.tags[index]}
+                                    onChange={(e) => handleTagChange(e, index)}
+                                    placeholder={`Tag ${index + 1}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div>
+                            <label htmlFor="modalidad" className="block text-lg font-medium text-gray-700">
+                                Modalidad
+                            </label>
+                            <select
+                                id="modalidad"
+                                name="modalidad"
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.modalidad}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="Presencial">Presencial</option>
+                                <option value="Híbrido">Híbrido</option>
+                                <option value="Remoto">Remoto</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="tipoTrabajo" className="block text-lg font-medium text-gray-700">
+                                Tipo de trabajo
+                            </label>
+                            <select
+                                id="tipoTrabajo"
+                                name="tipoTrabajo"
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.tipoTrabajo}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="Tiempo Completo">Tiempo Completo</option>
+                                <option value="Tiempo Parcial">Tiempo Parcial</option>
+                                <option value="Por Proyecto">Por Proyecto</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="fechaCierre" className="block text-lg font-medium text-gray-700">
+                                Fecha de Cierre
+                            </label>
                             <input
-                                key={index}
-                                type="text"
-                                name={`tag-${index}`}
-                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary mb-2"
-                                value={offerData.tags[index]}
-                                onChange={(e) => handleTagChange(e, index)}
-                                placeholder={`Tag ${index + 1}`}
+                                type="date"
+                                id="fechaCierre"
+                                name="fechaCierre"
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.fechaCierre}
+                                onChange={handleChange}
+                                required
                             />
-                        ))}
-                    </div>
-
-                    {/* Modalidad */}
-                    <div>
-                        <label htmlFor="modalidad" className="block text-lg font-medium text-gray-700">Modalidad</label>
-                        <select
-                            id="modalidad"
-                            name="modalidad"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.modalidad}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="Presencial">Presencial</option>
-                            <option value="Hibrido">Híbrido</option>
-                            <option value="Remoto">Remoto</option>
-                        </select>
-                    </div>
-
-                    {/* Tipo de Trabajo */}
-                    <div>
-                        <label htmlFor="tipoTrabajo" className="block text-lg font-medium text-gray-700">Tipo de trabajo</label>
-                        <select
-                            id="tipoTrabajo"
-                            name="tipoTrabajo"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.tipoTrabajo}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="Tiempo Completo">Tiempo Completo</option>
-                            <option value="Tiempo Parcial">Tiempo Parcial</option>
-                            <option value="Por Proyecto">Por Proyecto</option>
-                        </select>
-                    </div>
-
-                    {/* Fecha de Cierre */}
-                    <div>
-                        <label htmlFor="fechaCierre" className="block text-lg font-medium text-gray-700">Fecha de Cierre</label>
-                        <input
-                            type="date"
-                            id="fechaCierre"
-                            name="fechaCierre"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.fechaCierre}
-                            onChange={handleChange}
-                            required
-                        />
+                        </div>
                     </div>
 
                     <button

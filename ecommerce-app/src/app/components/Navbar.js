@@ -1,36 +1,43 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { HomeIcon, ChartPieIcon, CubeIcon, CogIcon, MoonIcon, BellIcon } from "@heroicons/react/24/outline";
+import {
+    HomeIcon,
+    ChartPieIcon,
+    DocumentIcon,
+    CogIcon,
+    MoonIcon,
+    BellIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Navbar({ userId, empresaId, rolId }) {
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState("");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const router = useRouter();
-    const currentPath = router.asPath; // Usamos asPath para obtener la ruta completa con parámetros dinámicos
+    const pathname = usePathname();
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
             if (!token) {
-                router.push('/auth/login');
+                router.push("/auth/login");
                 return;
             }
 
             const res = await fetch(`/api/user/${userId}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
             const data = await res.json();
 
             if (data.success) {
                 setUsername(data.user.username);
             } else {
-                router.push('/auth/login');
+                router.push("/auth/login");
             }
         };
 
@@ -38,24 +45,37 @@ export default function Navbar({ userId, empresaId, rolId }) {
     }, [userId, router]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        router.push('/auth/login');
+        localStorage.removeItem("token");
+        router.push("/auth/login");
     };
+
+    // Crear la ruta del dashboard dinámicamente
+    const dashboardHref =
+        empresaId && rolId
+            ? `/home/user/${userId}/${empresaId}/${rolId}`
+            : `/home/user/${userId}`;
+
+    const isDashboard = pathname === dashboardHref;
 
     return (
         <header className="flex justify-between border border-gray-200 items-center px-6 py-4 bg-white shadow-sm">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-                <Image src="/images/Matchify_logo.png" alt="Matchify Logo" width={110} height={110} />
+                <Image
+                    src="/images/Matchify_logo.png"
+                    alt="Matchify Logo"
+                    width={110}
+                    height={110}
+                />
             </div>
 
             {/* Navegación */}
             <nav className="hidden md:flex items-center space-x-8 text-gray-600">
-                <Link href={`/home/user/${userId}/${empresaId}/${rolId}`}>
+                <Link href={dashboardHref}>
                     <span
-                        className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
-                            currentPath === `/home/user/${userId}/${empresaId}/${rolId}`
-                                ? "text-blue-600 border-b-4 border-blue-600 pb-2"
+                        className={`relative flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
+                            isDashboard
+                                ? "text-blue-600 after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-[-21px] after:h-1 after:bg-blue-600"
                                 : ""
                         }`}
                     >
@@ -64,36 +84,43 @@ export default function Navbar({ userId, empresaId, rolId }) {
                     </span>
                 </Link>
 
+                {/* Otros enlaces de navegación */}
                 <Link href="/analytics">
                     <span
                         className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
-                            currentPath === "/analytics" ? "text-blue-600 border-b-4 border-blue-600 pb-2" : ""
+                            pathname === "/analytics"
+                                ? "text-blue-600 border-b-4 border-blue-600 pb-2"
+                                : ""
                         }`}
                     >
-                        <ChartPieIcon className="h-5 w-5 text-gray-600" />
+                        <ChartPieIcon className="h-5 w-5" />
                         <span>Analytics</span>
                     </span>
                 </Link>
 
-                <Link href="/products">
+                <Link href="/Plazas">
                     <span
                         className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
-                            currentPath === "/products" ? "text-blue-600 border-b-4 border-blue-600 pb-2" : ""
+                            pathname === "/Plazas"
+                                ? "text-blue-600 border-b-4 border-blue-600 pb-2"
+                                : ""
                         }`}
                     >
-                        <CubeIcon className="h-5 w-5 text-gray-600" />
-                        <span>Products</span>
+                        <DocumentIcon className="h-5 w-5" />
+                        <span>Plazas</span>
                     </span>
                 </Link>
 
-                <Link href="/settings">
+                <Link href="/Ajustes">
                     <span
                         className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
-                            currentPath === "/settings" ? "text-blue-600 border-b-4 border-blue-600 pb-2" : ""
+                            pathname === "/Ajustes"
+                                ? "text-blue-600 border-b-4 border-blue-600 pb-2"
+                                : ""
                         }`}
                     >
-                        <CogIcon className="h-5 w-5 text-gray-600" />
-                        <span>Settings</span>
+                        <CogIcon className="h-5 w-5" />
+                        <span>Ajustes</span>
                     </span>
                 </Link>
             </nav>
@@ -108,7 +135,10 @@ export default function Navbar({ userId, empresaId, rolId }) {
                     <span className="absolute top-0 right-0 block h-2 w-2 bg-orange-500 rounded-full"></span>
                 </button>
                 <div className="relative">
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="flex items-center space-x-2 focus:outline-none">
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="flex items-center space-x-2 focus:outline-none"
+                    >
                         <Image
                             src="/images/Profile.jpg"
                             alt="User Profile"
@@ -117,7 +147,12 @@ export default function Navbar({ userId, empresaId, rolId }) {
                             className="rounded-full"
                         />
                         <span className="text-gray-800">{username}</span>
-                        <Image src="/svg/arrow.svg" alt="Dropdown" width={20} height={20} />
+                        <Image
+                            src="/svg/arrow.svg"
+                            alt="Dropdown"
+                            width={20}
+                            height={20}
+                        />
                     </button>
                     {isMenuOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
