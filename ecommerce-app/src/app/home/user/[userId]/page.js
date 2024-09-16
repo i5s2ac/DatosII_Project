@@ -114,7 +114,7 @@ export default function UserPage({ params }) {
                                 type="text"
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                placeholder="Search for jobs, companies..."
+                                placeholder="Busca trabajos, empresas..."
                                 className="w-full px-6 py-3 text-gray-700 placeholder-gray-500 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <button
@@ -222,7 +222,7 @@ export default function UserPage({ params }) {
                                         <p className="text-lg text-gray-600 mb-4">{selectedJob.descripcion}</p>
                                         <p className="text-lg text-gray-600 mb-4">{selectedJob.ubicacion}</p>
                                         <div className="flex items-center space-x-4 mb-4">
-                                            <button className="bg-blue-600 text-white px-6 py-2 rounded-full">Apply Now</button>
+                                            <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-200">Postularme</button>
                                         </div>
                                         <p className="text-lg font-bold mb-4">{`$${selectedJob.salario}`}</p>
                                         <p className="text-gray-600 mb-2">Contract: Permanent</p>

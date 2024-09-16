@@ -20,11 +20,12 @@ module.exports = {
       descripcion: {
         type: Sequelize.TEXT
       },
-      perfilUsuarioId: {
+      usuarioid: {
         type: Sequelize.INTEGER,
+        allowNull: false,  // No permite valores nulos
         references: {
-          model: 'perfil_usuarios', // Asegúrate que el nombre coincida con el de la tabla de PerfilUsuario
-          key: 'id'
+          model: 'users',  // Nombre del modelo referenciado (ajusta si el nombre del modelo es diferente)
+          key: 'id',       // Clave foránea que hace referencia al campo 'id' del modelo referenciado
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'

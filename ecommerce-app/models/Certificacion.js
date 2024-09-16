@@ -1,7 +1,6 @@
 // models/Certificacion.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../src/lib/sequelize');
-const PerfilUsuario = require('./perfilusuario');
 
 const Certificacion = sequelize.define('Certificacion', {
     nombre: {
@@ -12,19 +11,18 @@ const Certificacion = sequelize.define('Certificacion', {
         type: DataTypes.STRING,
     },
     fechaObtencion: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
     },
     descripcion: {
         type: DataTypes.TEXT,
     },
-    perfilUsuarioId: {
+    usuarioid: {
         type: DataTypes.INTEGER,
+        allowNull: false,  // No permite valores nulos
         references: {
-            model: PerfilUsuario,
-            key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+            model: 'Users',  // Nombre del modelo referenciado (ajusta si el nombre del modelo es diferente)
+            key: 'id',       // Clave foránea que hace referencia al campo 'id' del modelo referenciado
+        }
     },
 }, {
     tableName: 'certificaciones',

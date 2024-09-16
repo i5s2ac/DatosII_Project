@@ -20,16 +20,17 @@ module.exports = {
         type: Sequelize.STRING
       },
       fechaInicio: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
       },
       fechaFin: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
       },
-      perfilUsuarioId: {
+      usuarioid: {
         type: Sequelize.INTEGER,
+        allowNull: false,  // No permite valores nulos
         references: {
-          model: 'perfil_usuarios',  // Nombre de la tabla referenciada
-          key: 'id'
+          model: 'users',  // Nombre del modelo referenciado (ajusta si el nombre del modelo es diferente)
+          key: 'id',       // Clave foránea que hace referencia al campo 'id' del modelo referenciado
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'

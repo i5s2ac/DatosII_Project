@@ -11,11 +11,15 @@ import {
     CogIcon,
     MoonIcon,
     BellIcon,
+    PlusIcon
 } from "@heroicons/react/24/outline";
 
 export default function Navbar({ userId, empresaId, rolId }) {
     const [username, setUsername] = useState("");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isInCompany, setIsInCompany] = useState(false);
+    const [hasCV, setHasCV] = useState(false);
+    const [loading, setLoading] = useState(true); // Estado de carga
     const router = useRouter();
     const pathname = usePathname();
 
@@ -27,21 +31,71 @@ export default function Navbar({ userId, empresaId, rolId }) {
                 return;
             }
 
-            const res = await fetch(`/api/user/${userId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const data = await res.json();
+            try {
+                // Mostrar estado de carga
+                setLoading(true);
 
-            if (data.success) {
-                setUsername(data.user.username);
-            } else {
+                // Fetch de los datos del usuario
+                const res = await fetch(`/api/user/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    setUsername(data.user.username);
+
+                    // Verificar si el usuario está en una empresa
+                    const resCompany = await fetch(`/api/user/${userId}/empresausuario`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    const companyData = await resCompany.json();
+                    setIsInCompany(companyData.isInCompany);
+
+                    // Verificar si el usuario ya tiene un CV
+                    const endpoint = `/api/user/${userId}/getCV`; // El nuevo endpoint consolidado
+
+                    const response = await fetch(endpoint, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }).then((res) => res.json());
+
+                    if (response.success) {
+                        const { habilidades, idiomas, experiencias, educaciones, certificaciones } = response.data;
+
+                        // Verificar si existe algún dato
+                        const hasAnyData =
+                            habilidades.length > 0 ||
+                            idiomas.length > 0 ||
+                            experiencias.length > 0 ||
+                            educaciones.length > 0 ||
+                            certificaciones.length > 0;
+
+                        setHasCV(hasAnyData);
+                    } else {
+                        // Manejar el caso de error
+                        console.error('Error fetching CV data:', response.message);
+                    }
+
+                } else {
+                    router.push("/auth/login");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
                 router.push("/auth/login");
+            } finally {
+                // Ocultar estado de carga
+                setLoading(false);
             }
         };
 
-        fetchUser();
+        if (userId) {
+            fetchUser();
+        }
     }, [userId, router]);
 
     const handleLogout = () => {
@@ -56,6 +110,25 @@ export default function Navbar({ userId, empresaId, rolId }) {
             : `/home/user/${userId}`;
 
     const isDashboard = pathname === dashboardHref;
+    const handleNavigation = () => {
+        router.push(`/home/user/${userId}/CV`);
+    };
+
+    if (loading) {
+        return (
+            <header className="flex justify-between border border-gray-200 items-center px-6 py-4 bg-white shadow-sm">
+                <div className="flex items-center space-x-2">
+                    <div className="flex items-center">
+                        <Image src="/images/Matchify_logo.png" alt="Matchify Logo" width={110} height={110} />
+                    </div>
+                </div>
+                <div className="flex items-center space-x-6">
+                    {/* Mostrar un spinner o mensaje de carga */}
+                    <span>Cargando...</span>
+                </div>
+            </header>
+        );
+    }
 
     return (
         <header className="flex justify-between border border-gray-200 items-center px-6 py-4 bg-white shadow-sm">
@@ -123,6 +196,17 @@ export default function Navbar({ userId, empresaId, rolId }) {
                         <span>Ajustes</span>
                     </span>
                 </Link>
+
+                {/* Botón Crear/Modificar CV */}
+                {!isInCompany && (
+                    <button
+                        onClick={handleNavigation}
+                        className="flex items-center space-x-2 hover:text-blue-600 transition"
+                    >
+                        <PlusIcon className={`h-5 w-5 ${hasCV ? "text-green-600" : "text-gray-600"}`} />
+                        <span>{hasCV ? "Modificar CV" : "Crear CV"}</span>
+                    </button>
+                )}
             </nav>
 
             {/* Íconos de acciones y menú del usuario */}

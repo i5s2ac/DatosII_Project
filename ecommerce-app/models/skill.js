@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../src/lib/sequelize');
-const PerfilUsuario = require('./perfilusuario');
+const Usuario = require("./user");
 
 const Skill = sequelize.define('Skill', {
   nombre: {
@@ -15,10 +15,10 @@ const Skill = sequelize.define('Skill', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  perfilUsuarioId: {
+  usuarioId: {
     type: DataTypes.INTEGER,
     references: {
-      model: PerfilUsuario,
+      model: Usuario,
       key: 'id',
     },
     onUpdate: 'CASCADE',
