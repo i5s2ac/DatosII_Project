@@ -14,7 +14,8 @@ module.exports = {
         allowNull: false
       },
       descripcion: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
+        allowNull: false
       },
       ubicacion: {
         type: Sequelize.STRING
@@ -23,7 +24,8 @@ module.exports = {
         type: Sequelize.DECIMAL
       },
       fechaPublicacion: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       },
       fechaCierre: {
         type: Sequelize.DATE
@@ -31,16 +33,16 @@ module.exports = {
       empresaId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'empresas',  // Asegúrate de que el nombre de la tabla coincida con el de Empresa
+          model: 'empresas',
           key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      userId: {  // Agrega la referencia al usuario
+      userId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'users',  // Asegúrate de que el nombre de la tabla coincida con el de Usuario
+          model: 'users',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -50,7 +52,23 @@ module.exports = {
       estatus: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: 'Activo'  // Valor por defecto "Activo"
+        defaultValue: 'Activo'
+      },
+      // Cambiamos ARRAY a TEXT para MySQL, y almacenaremos los tags como una cadena separada por comas
+      tags: {
+        type: Sequelize.TEXT,  // Usamos TEXT en lugar de ARRAY
+        allowNull: true,
+        // Nota: no podemos aplicar validaciones de longitud directamente en el SQL, por lo que se manejará en el backend
+      },
+      modalidad: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'Presencial'
+      },
+      tipoTrabajo: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'Tiempo Completo'
       },
       createdAt: {
         allowNull: false,

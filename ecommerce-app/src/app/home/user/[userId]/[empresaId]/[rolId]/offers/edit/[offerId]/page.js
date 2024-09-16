@@ -12,35 +12,42 @@ const MySwal = withReactContent(Swal);
 export default function EditOfferPage({ params }) {
     const { userId, empresaId, rolId, offerId } = params;
     const router = useRouter();
+
     const [offerData, setOfferData] = useState({
         titulo: '',
         descripcion: '',
         ubicacion: '',
         salario: '',
-        fechaPublicacion: '',
         fechaCierre: '',
-        estatus: '',
+        estatus: 'Activo',
         empresaId: empresaId || '',
-        userId: userId || "",
+        userId: userId || '',
+        tags: ['', '', ''], // Hasta 3 tags inicializados como un array vacío
+        modalidad: 'Presencial', // Modalidad por defecto
+        tipoTrabajo: 'Tiempo Completo', // Tipo de trabajo por defecto
     });
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '';  // Si no hay fecha, retornamos un string vacío
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Los meses empiezan en 0
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    // Fetch the existing offer data on component mount
+    // Obtener los datos existentes de la oferta al montar el componente
     useEffect(() => {
         const fetchOfferData = async () => {
             try {
                 const res = await fetch(`/api/ofertas/${offerId}`);
                 const data = await res.json();
-                if (res.ok) {
-                    setOfferData(data.oferta);  // Carga los datos existentes en el formulario
+
+                if (res.ok && data.oferta) {
+                    let tags = ['', '', ''];
+                    if (Array.isArray(data.oferta.tags)) {
+                        tags = data.oferta.tags;
+                    } else if (typeof data.oferta.tags === 'string') {
+                        tags = data.oferta.tags.split(',').map(tag => tag.trim());
+                    }
+
+                    setOfferData({
+                        ...offerData,
+                        ...data.oferta,
+                        fechaCierre: data.oferta.fechaCierre ? data.oferta.fechaCierre.split('T')[0] : '',
+                        tags: tags.length === 3 ? tags : [...tags, ...Array(3 - tags.length).fill('')]
+                    });
                 } else {
                     throw new Error('Error al cargar los datos de la oferta');
                 }
@@ -65,8 +72,43 @@ export default function EditOfferPage({ params }) {
         });
     };
 
+    // Manejo de cambios de los tags
+    const handleTagChange = (e, index) => {
+        const newTags = [...offerData.tags];
+        newTags[index] = e.target.value;
+        setOfferData({
+            ...offerData,
+            tags: newTags,
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validar que la fecha de cierre sea mayor a la fecha actual
+        const currentDate = new Date();
+        const closingDate = new Date(offerData.fechaCierre);
+
+        if (closingDate <= currentDate) {
+            return MySwal.fire({
+                title: 'Error',
+                text: 'La fecha de cierre debe ser posterior a la fecha actual.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        // Filtrar tags vacíos
+        const filteredTags = offerData.tags.filter(tag => tag.trim() !== '');
+
+        if (filteredTags.length > 3) {
+            return MySwal.fire({
+                title: 'Error',
+                text: 'Solo se permiten hasta 3 tags.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        }
 
         try {
             const res = await fetch(`/api/ofertas/${offerId}/update`, {
@@ -74,13 +116,16 @@ export default function EditOfferPage({ params }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(offerData),
+                body: JSON.stringify({
+                    ...offerData,
+                    tags: filteredTags, // Enviar los tags como un arreglo
+                }),
             });
 
             if (res.ok) {
+                // Mostrar SweetAlert2 para el éxito
                 MySwal.fire({
-                    title: '¡Oferta actualizada!',
-                    text: 'La oferta ha sido actualizada exitosamente.',
+                    title: '¡Oferta actualizada exitosamente!',
                     icon: 'success',
                     showConfirmButton: false,
                     timer: 1500
@@ -89,12 +134,14 @@ export default function EditOfferPage({ params }) {
                     router.back();
                 }, 1500); // Redirige después de 1.5 segundos
             } else {
-                throw new Error('Error al actualizar la oferta.');
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Error al actualizar la oferta.');
             }
         } catch (error) {
+            // Mostrar SweetAlert2 para el error
             MySwal.fire({
                 title: 'Error',
-                text: 'Hubo un error al actualizar la oferta. Por favor, intenta de nuevo.',
+                text: error.message || 'Hubo un error al actualizar la oferta. Por favor, intenta de nuevo.',
                 icon: 'error',
                 confirmButtonText: 'Entendido'
             });
@@ -112,6 +159,8 @@ export default function EditOfferPage({ params }) {
                     <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">Editar oferta de trabajo</h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Campos del formulario similares al de creación */}
+                    {/* Título */}
                     <div>
                         <label htmlFor="titulo" className="block text-lg font-medium text-gray-700">Título</label>
                         <input
@@ -126,12 +175,13 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
+                    {/* Descripción */}
                     <div>
-                        <label htmlFor="descripcion"
-                               className="block text-lg font-medium text-gray-700">Descripción</label>
+                        <label htmlFor="descripcion" className="block text-lg font-medium text-gray-700">Descripción (255 caracteres)</label>
                         <textarea
                             id="descripcion"
                             name="descripcion"
+                            maxLength="255"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.descripcion}
                             onChange={handleChange}
@@ -140,6 +190,7 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
+                    {/* Ubicación */}
                     <div>
                         <label htmlFor="ubicacion" className="block text-lg font-medium text-gray-700">Ubicación</label>
                         <input
@@ -154,6 +205,7 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
+                    {/* Salario */}
                     <div>
                         <label htmlFor="salario" className="block text-lg font-medium text-gray-700">Salario</label>
                         <input
@@ -168,49 +220,69 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
+                    {/* Tags */}
                     <div>
-                        <label htmlFor="fechaPublicacion" className="block text-lg font-medium text-gray-700">Fecha de
-                            Publicación</label>
-                        <input
-                            type="date"
-                            id="fechaPublicacion"
-                            name="fechaPublicacion"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={formatDate(offerData.fechaPublicacion)}
-                            onChange={handleChange}
-                            required
-                        />
+                        <label className="block text-lg font-medium text-gray-700">Tags (Máximo 3)</label>
+                        {[0, 1, 2].map((index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                name={`tag-${index}`}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary mb-2"
+                                value={offerData.tags[index]}
+                                onChange={(e) => handleTagChange(e, index)}
+                                placeholder={`Tag ${index + 1}`}
+                            />
+                        ))}
                     </div>
 
+                    {/* Modalidad */}
                     <div>
-                        <label htmlFor="fechaCierre" className="block text-lg font-medium text-gray-700">Fecha de
-                            Cierre</label>
+                        <label htmlFor="modalidad" className="block text-lg font-medium text-gray-700">Modalidad</label>
+                        <select
+                            id="modalidad"
+                            name="modalidad"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            value={offerData.modalidad}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="Presencial">Presencial</option>
+                            <option value="Hibrido">Híbrido</option>
+                            <option value="Remoto">Remoto</option>
+                        </select>
+                    </div>
+
+                    {/* Tipo de Trabajo */}
+                    <div>
+                        <label htmlFor="tipoTrabajo" className="block text-lg font-medium text-gray-700">Tipo de trabajo</label>
+                        <select
+                            id="tipoTrabajo"
+                            name="tipoTrabajo"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            value={offerData.tipoTrabajo}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="Tiempo Completo">Tiempo Completo</option>
+                            <option value="Tiempo Parcial">Tiempo Parcial</option>
+                            <option value="Por Proyecto">Por Proyecto</option>
+                        </select>
+                    </div>
+
+                    {/* Fecha de Cierre */}
+                    <div>
+                        <label htmlFor="fechaCierre" className="block text-lg font-medium text-gray-700">Fecha de Cierre</label>
                         <input
                             type="date"
                             id="fechaCierre"
                             name="fechaCierre"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={formatDate(offerData.fechaCierre)}
+                            value={offerData.fechaCierre}
                             onChange={handleChange}
                             required
                         />
                     </div>
-
-                    <div>
-                        <label htmlFor="estatus" className="block text-lg font-medium text-gray-700">Estatus</label>
-                        <select
-                            id="estatus"
-                            name="estatus"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.estatus}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                        </select>
-                    </div>
-
 
                     <button
                         type="submit"

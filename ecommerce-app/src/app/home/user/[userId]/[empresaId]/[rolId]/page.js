@@ -11,6 +11,7 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { CalendarIcon, CurrencyDollarIcon, BriefcaseIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 
 const MySwal = withReactContent(Swal);
@@ -42,7 +43,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Desarrollador Full-Stack",
             salary: 15000,
-            candidatePhoto: "/images/candidate1.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Carlos Méndez",
             tags: ["Full Time", "1 Year Experience"],
             status: "Pending",
@@ -50,7 +51,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -58,7 +59,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -66,7 +67,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -74,7 +75,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -82,7 +83,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -90,7 +91,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -98,7 +99,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -106,7 +107,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -114,7 +115,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -122,7 +123,7 @@ export default function UserPage({ params }) {
         {
             jobTitle: "Diseñador UI/UX",
             salary: 12000,
-            candidatePhoto: "/images/candidate2.jpg",
+            candidatePhoto: "/images/Profile.jpg",
             candidateName: "Ana Martínez",
             tags: ["Part Time", "Senior"],
             status: "Pending",
@@ -216,7 +217,7 @@ export default function UserPage({ params }) {
             salaryFilter ? parseFloat(offer.salario) <= parseFloat(salaryFilter) : true
         )
         .filter((offer) =>
-            typeFilter ? offer.tipo.includes(typeFilter) : true
+            typeFilter ? offer.tipoTrabajo.includes(typeFilter) : true
         );
 
     // Función para eliminar una oferta con SweetAlert2
@@ -244,6 +245,7 @@ export default function UserPage({ params }) {
                             'La oferta ha sido eliminada.',
                             'success'
                         );
+
                     } else {
                         throw new Error('Error al eliminar la oferta');
                     }
@@ -343,6 +345,7 @@ export default function UserPage({ params }) {
                             <h1 className="text-2xl font-medium text-gray-900">
                                 ¡Hola, {username}!
                             </h1>
+
                             <p className="text-md text-gray-500 mt-1">Estamos listos para ayudarte a encontrar tu
                                 próximo reto</p>
                         </div>
@@ -350,9 +353,10 @@ export default function UserPage({ params }) {
                     <div>
                         <button
                             className="px-5 py-2 bg-transparent text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition focus:outline-none"
-                            onClick={() => alert("Ir a configuración")}
                         >
-                            Editar Perfil
+                            <Link href={`/home/user/${userId}/edit`}>
+                                Editar Perfil
+                            </Link>
                         </button>
                     </div>
                 </div>
@@ -545,8 +549,10 @@ export default function UserPage({ params }) {
                                 onChange={(e) => setTypeFilter(e.target.value)}
                             >
                                 <option value="">Filtrar por tipo de trabajo</option>
-                                <option value="Full-time">Full-time</option>
-                                <option value="Part-time">Part-time</option>
+                                <option value="Tiempo Completo">Tiempo Completo</option>
+                                <option value="Tiempo Parcial">Tiempo Parcial</option>
+                                <option value="Por Proyecto">Por Proyecto</option>
+
                             </select>
                         </div>
                     </div>
@@ -564,6 +570,8 @@ export default function UserPage({ params }) {
 
                         <div className="w-full md:w-1/3 pr-4">
                             <h2 className="text-2xl font-semibold text-gray-800 mt-8">Plazas Creadas</h2>
+                            <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
+                                próximo reto</p>
 
                             {filteredOffers.length === 0 ? (
                                 <p className="text-gray-600 border border-gray-200 p-4 rounded-md">No se encontraron
@@ -617,12 +625,14 @@ export default function UserPage({ params }) {
 
                                                 {/* Etiquetas */}
                                                 <div className="mt-6 flex flex-wrap gap-2">
-                                                    <span
-                                                        className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded">{offer.tipo || "Full Time"}</span>
-                                                    <span
-                                                        className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded">Min. {offer.experiencia || "1 Year"}</span>
-                                                    <span
-                                                        className="bg-gray-100 text-gray-800 text-sm font-medium px-2.5 py-0.5 rounded">{offer.nivel || "Senior Level"}</span>
+                                                    {/* Mostrar los tags de la oferta */}
+                                                    {offer.tags && (
+                                                        (Array.isArray(offer.tags) ? offer.tags : offer.tags.split(',')).map((tag, index) => (
+                                                            <span key={index} className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded">
+                {tag.trim()}
+            </span>
+                                                        ))
+                                                    )}
                                                 </div>
 
                                                 {/* Botones fijos */}
@@ -651,7 +661,9 @@ export default function UserPage({ params }) {
                         {/* Tabla de Candidatos - Derecha */}
                         <div className="w-full md:w-2/3 pl-4 ">
 
-                        <h2 className="text-2xl font-semibold text-gray-800 mt-8 ">Candidatos</h2>
+                            <h2 className="text-2xl font-semibold text-gray-800 mt-7 ">Candidatos</h2>
+                            <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
+                                próximo reto</p>
 
                             <div className="bg-white p-6 rounded-lg shadow-lg mt-6 border border-gray-200 ">
                                 {/* Pestañas */}

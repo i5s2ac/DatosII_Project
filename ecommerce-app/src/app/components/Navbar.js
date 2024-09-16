@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-// Importamos los iconos de Heroicons v2
 import { HomeIcon, ChartPieIcon, CubeIcon, CogIcon, MoonIcon, BellIcon } from "@heroicons/react/24/outline";
 
-export default function Navbar({ userId }) {
+export default function Navbar({ userId, empresaId, rolId }) {
     const [username, setUsername] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const router = useRouter();
+    const currentPath = router.asPath; // Usamos asPath para obtener la ruta completa con parámetros dinámicos
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -46,30 +46,55 @@ export default function Navbar({ userId }) {
         <header className="flex justify-between border border-gray-200 items-center px-6 py-4 bg-white shadow-sm">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-                <div className="flex items-center">
-
-                    <Image src="/images/Matchify_logo.png" alt="Matchify Logo" width={110} height={110} />                </div>
+                <Image src="/images/Matchify_logo.png" alt="Matchify Logo" width={110} height={110} />
             </div>
 
             {/* Navegación */}
             <nav className="hidden md:flex items-center space-x-8 text-gray-600">
-                <Link href="/dashboard" className="flex items-center space-x-2 hover:text-blue-600 transition">
-                    <HomeIcon className="h-5 w-5 text-gray-600" />
-                    <span>Dashboard</span>
+                <Link href={`/home/user/${userId}/${empresaId}/${rolId}`}>
+                    <span
+                        className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
+                            currentPath === `/home/user/${userId}/${empresaId}/${rolId}`
+                                ? "text-blue-600 border-b-4 border-blue-600 pb-2"
+                                : ""
+                        }`}
+                    >
+                        <HomeIcon className="h-5 w-5" />
+                        <span>Dashboard</span>
+                    </span>
                 </Link>
-                <Link href="/analytics" className="flex items-center space-x-2 hover:text-blue-600 transition">
-                    <ChartPieIcon className="h-5 w-5 text-gray-600" />
-                    <span>Analytics</span>
-                    <span className="ml-1">▾</span>
+
+                <Link href="/analytics">
+                    <span
+                        className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
+                            currentPath === "/analytics" ? "text-blue-600 border-b-4 border-blue-600 pb-2" : ""
+                        }`}
+                    >
+                        <ChartPieIcon className="h-5 w-5 text-gray-600" />
+                        <span>Analytics</span>
+                    </span>
                 </Link>
-                <Link href="/products" className="flex items-center space-x-2 hover:text-blue-600 transition">
-                    <CubeIcon className="h-5 w-5 text-gray-600" />
-                    <span>Products</span>
-                    <span className="ml-1">▾</span>
+
+                <Link href="/products">
+                    <span
+                        className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
+                            currentPath === "/products" ? "text-blue-600 border-b-4 border-blue-600 pb-2" : ""
+                        }`}
+                    >
+                        <CubeIcon className="h-5 w-5 text-gray-600" />
+                        <span>Products</span>
+                    </span>
                 </Link>
-                <Link href="/settings" className="flex items-center space-x-2 hover:text-blue-600 transition">
-                    <CogIcon className="h-5 w-5 text-gray-600" />
-                    <span>Settings</span>
+
+                <Link href="/settings">
+                    <span
+                        className={`flex items-center space-x-2 hover:text-blue-600 transition cursor-pointer ${
+                            currentPath === "/settings" ? "text-blue-600 border-b-4 border-blue-600 pb-2" : ""
+                        }`}
+                    >
+                        <CogIcon className="h-5 w-5 text-gray-600" />
+                        <span>Settings</span>
+                    </span>
                 </Link>
             </nav>
 
@@ -96,12 +121,17 @@ export default function Navbar({ userId }) {
                     </button>
                     {isMenuOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                            <Link href={`/home/user/${userId}/edit`} className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                Edit Profile
+                            <Link href={`/home/user/${userId}/edit`}>
+                                <span className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
+                                    Edit Profile
+                                </span>
                             </Link>
-                            <a href="#" onClick={handleLogout} className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            <span
+                                onClick={handleLogout}
+                                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                            >
                                 Logout
-                            </a>
+                            </span>
                         </div>
                     )}
                 </div>

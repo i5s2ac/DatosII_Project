@@ -18,12 +18,17 @@ export default function CreateOfferPage({ params }) {
         descripcion: '',
         ubicacion: '',
         salario: '',
-        fechaPublicacion: '',
         fechaCierre: '',
         estatus: 'Activo',
         empresaId: empresaId || '',
         userId: userId || "",
+        tags: ['', '', ''], // Se permitirá agregar hasta 3 tags
+        modalidad: 'Presencial', // Modalidad por defecto
+        tipoTrabajo: 'Tiempo Completo', // Tipo de trabajo por defecto
     });
+
+    // La fecha de publicación se asigna automáticamente a la fecha actual
+    const fechaPublicacion = new Date().toISOString().split('T')[0];
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -33,8 +38,43 @@ export default function CreateOfferPage({ params }) {
         });
     };
 
+    // Manejo de cambios de los tags
+    const handleTagChange = (e, index) => {
+        const newTags = [...offerData.tags];
+        newTags[index] = e.target.value;
+        setOfferData({
+            ...offerData,
+            tags: newTags,
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validar que la fecha de cierre sea mayor a la fecha actual
+        const currentDate = new Date();
+        const closingDate = new Date(offerData.fechaCierre);
+
+        if (closingDate <= currentDate) {
+            return MySwal.fire({
+                title: 'Error',
+                text: 'La fecha de cierre debe ser posterior a la fecha actual.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        // Filtrar tags vacíos
+        const filteredTags = offerData.tags.filter(tag => tag.trim() !== '');
+
+        if (filteredTags.length > 3) {
+            return MySwal.fire({
+                title: 'Error',
+                text: 'Solo se permiten hasta 3 tags.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        }
 
         try {
             const res = await fetch('/api/ofertas/create', {
@@ -42,7 +82,11 @@ export default function CreateOfferPage({ params }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(offerData),
+                body: JSON.stringify({
+                    ...offerData,
+                    fechaPublicacion, // Se envía la fecha de publicación como la fecha actual
+                    tags: filteredTags, // Asegúrate de que los tags se envíen como un array
+                }),
             });
 
             if (res.ok) {
@@ -69,6 +113,7 @@ export default function CreateOfferPage({ params }) {
             });
         }
     };
+
 
     return (
         <Layout userId={userId} empresaId={empresaId} rolId={rolId}>
@@ -97,10 +142,11 @@ export default function CreateOfferPage({ params }) {
 
                     <div>
                         <label htmlFor="descripcion"
-                               className="block text-lg font-medium text-gray-700">Descripción</label>
+                               className="block text-lg font-medium text-gray-700">Descripción (255 caracteres)</label>
                         <textarea
                             id="descripcion"
                             name="descripcion"
+                            maxLength="255"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                             value={offerData.descripcion}
                             onChange={handleChange}
@@ -137,18 +183,54 @@ export default function CreateOfferPage({ params }) {
                         />
                     </div>
 
+                    {/* Tags */}
                     <div>
-                        <label htmlFor="fechaPublicacion" className="block text-lg font-medium text-gray-700">Fecha de
-                            Publicación</label>
-                        <input
-                            type="date"
-                            id="fechaPublicacion"
-                            name="fechaPublicacion"
+                        <label className="block text-lg font-medium text-gray-700">Tags (Máximo 3)</label>
+                        {[0, 1, 2].map((index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                name={`tag-${index}`}
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary mb-2"
+                                value={offerData.tags[index]}
+                                onChange={(e) => handleTagChange(e, index)}
+                                placeholder={`Tag ${index + 1}`}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Modalidad */}
+                    <div>
+                        <label htmlFor="modalidad" className="block text-lg font-medium text-gray-700">Modalidad</label>
+                        <select
+                            id="modalidad"
+                            name="modalidad"
                             className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.fechaPublicacion}
+                            value={offerData.modalidad}
                             onChange={handleChange}
                             required
-                        />
+                        >
+                            <option value="Presencial">Presencial</option>
+                            <option value="Hibrido">Híbrido</option>
+                            <option value="Remoto">Remoto</option>
+                        </select>
+                    </div>
+
+                    {/* Tipo de Trabajo */}
+                    <div>
+                        <label htmlFor="tipoTrabajo" className="block text-lg font-medium text-gray-700">Tipo de trabajo</label>
+                        <select
+                            id="tipoTrabajo"
+                            name="tipoTrabajo"
+                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                            value={offerData.tipoTrabajo}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="Tiempo Completo">Tiempo Completo</option>
+                            <option value="Tiempo Parcial">Tiempo Parcial</option>
+                            <option value="Por Proyecto">Por Proyecto</option>
+                        </select>
                     </div>
 
                     <div>
@@ -164,22 +246,6 @@ export default function CreateOfferPage({ params }) {
                             required
                         />
                     </div>
-
-                    <div>
-                        <label htmlFor="estatus" className="block text-lg font-medium text-gray-700">Estatus</label>
-                        <select
-                            id="estatus"
-                            name="estatus"
-                            className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                            value={offerData.estatus}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                        </select>
-                    </div>
-
 
                     <button
                         type="submit"
