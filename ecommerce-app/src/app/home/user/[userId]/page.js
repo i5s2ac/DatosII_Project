@@ -156,19 +156,8 @@ export default function UserPage({ params }) {
                 <p className="mt-6 text-gray-700 leading-relaxed text-md text-justify">
                     {selectedJob.descripcion}
                 </p>
-                <p className="text-gray-500 text-lg">{selectedJob.empresa?.nombre || 'Empresa no especificada'}</p>
-                <p className="text-gray-500 text-lg">{selectedJob.ubicacion || 'Ubicación no especificada'}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-base md:text-lg mb-6">
-                <span className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full">
-                    {selectedJob.modalidad || 'Modalidad no especificada'}
-                </span>
-                {selectedJob.tags?.map((tag, index) => (
-                    <span key={index} className="px-3 py-1 bg-yellow-100 text-yellow-600 text-2xl rounded-full">
-                        {tag}
-                    </span>
-                ))}
-            </div>
+
             <button
                 className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-200 shadow-lg">
                 Aplicar ahora
@@ -179,9 +168,9 @@ export default function UserPage({ params }) {
     const renderCompanyDetails = () => (
         <>
             {selectedJob.empresa ? (
-                <div className="mt-12 space-y-8">
-                    <h3 className="text-4xl font-bold mb-6 text-gray-800">
-                        <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 mb-1"/>
+                <div className="mt-12 space-y-2">
+                    <h3 className="text-4xl font-bold text-gray-800">
+                        <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 "/>
                         Información de la Empresa
                     </h3>
 
@@ -242,8 +231,11 @@ export default function UserPage({ params }) {
                         </div>
                     </div>
 
-                    <h3 className="text-4xl font-bold mt-6 text-gray-800">
-                        <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 mb-3"/>
+                    {/* Add increased spacing before Información de Contacto */}
+                    <div className="py-3"></div>
+
+                    <h3 className="text-4xl font-bold  text-gray-800">
+                        <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 mb-1 "/>
                         Información de Contacto
                     </h3>
 
@@ -254,7 +246,6 @@ export default function UserPage({ params }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
 
                         {/* Teléfono */}
                         <div className="p-6 bg-white text-red-800 rounded-xl shadow-md flex items-center space-x-4">
@@ -276,13 +267,13 @@ export default function UserPage({ params }) {
 
                     </div>
 
-
                 </div>
             ) : (
                 <p className="text-gray-700">Información de la empresa no disponible.</p>
             )}
         </>
     );
+
 
     return (
         <Layout userId={userId}>
@@ -367,9 +358,9 @@ export default function UserPage({ params }) {
                                         className="w-full pl-10 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         <option value="">Salario</option>
-                                        <option value="low">Menos de $1000</option>
-                                        <option value="medium">Entre $1000 y $5000</option>
-                                        <option value="high">Más de $5000</option>
+                                        <option value="low">Menos de Q1000</option>
+                                        <option value="medium">Entre Q1000 y Q5000</option>
+                                        <option value="high">Más de Q5000</option>
                                     </select>
                                 </div>
                                 <div className="relative">
@@ -381,10 +372,9 @@ export default function UserPage({ params }) {
                                         className="w-full pl-10 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         <option value="">Tipo de trabajo</option>
-                                        <option value="Tiempo completo">Tiempo completo</option>
-                                        <option value="Medio tiempo">Medio tiempo</option>
-                                        <option value="Temporal">Temporal</option>
-                                        <option value="Contrato">Contrato</option>
+                                        <option value="Tiempo Completo">Tiempo completo</option>
+                                        <option value="Tiempo Parcial">Tiempo Parcial</option>
+                                        <option value="Por Proyecto">Por proyecto</option>
                                     </select>
                                 </div>
                                 <div className="relative">
@@ -443,17 +433,17 @@ export default function UserPage({ params }) {
                                                     </div>
                                                 </div>
 
-                                                <p className="text-gray-600">Compañía: {job.empresa?.nombre || 'Empresa no especificada'}</p>
-                                                <p className="text-gray-500 mt-2 text-md">{job.descripcion}</p>
+                                                <p className="text-gray-900 mt-2 font-bold">Compañía: {job.empresa?.nombre || 'Empresa no especificada'}</p>
+                                                <p className="text-gray-500 mt-4 text-md">{job.descripcion}</p>
 
-                                                <p className="mt-2 text-gray-500 text-md">Ubicación: {job.ubicacion}</p>
+                                                <p className="mt-4 text-gray-800 font-bold text-md">Ubicación: {job.ubicacion}</p>
 
-                                                <div className="mt-2 flex flex-wrap items-center gap-3 text-md">
+                                                <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
                                                     <span className="text-gray-900 font-semibold">
                                                         Oferta Salarial: {job.salario ? `Q${job.salario}` : 'Salario no especificado'}
                                                     </span>
                                                 </div>
-                                                <div className="mt-2 flex flex-wrap items-center gap-3 text-md">
+                                                <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
                                                     <span
                                                         className="px-3 py-1 bg-green-200 text-green-700 rounded-full font-medium">
                                                         {job.tipoTrabajo || 'Tipo no especificado'}
@@ -499,7 +489,7 @@ export default function UserPage({ params }) {
                                         <div className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
                                             <div className="text-sm">Salario</div>
                                             <div className="text-2xl font-bold">Q{selectedJob.salario} <span
-                                                className="text-base font-normal">/Month</span>
+                                                className="text-base font-normal">/Mes</span>
                                             </div>
                                         </div>
 
