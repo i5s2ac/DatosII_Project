@@ -1,27 +1,30 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../src/lib/sequelize');
+import { DataTypes } from 'sequelize';
+import sequelize from '../src/lib/sequelize';
+import OfertaEmpleo from './OfertaEmpleo'; // Importación directa permitida
 
 const User = sequelize.define('User', {
   username: {
     type: DataTypes.STRING,
-    allowNull: false,  // No permite valores nulos
+    allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,  // No permite valores nulos
-    unique: true,      // El valor debe ser único en la tabla
+    allowNull: false,
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,  // No permite valores nulos
+    allowNull: false,
   },
   telefono: {
     type: DataTypes.STRING,
-    allowNull: false,  // No permite valores nulos
+    allowNull: true,
   },
 }, {
-  timestamps: true,       // Agrega campos createdAt y updatedAt
-  tableName: 'users',     // Nombre de la tabla en la base de datos
+  timestamps: true,
+  tableName: 'users',
 });
 
-module.exports = User;
+// Asociaciones directas que no generan ciclos
+User.hasMany(OfertaEmpleo, { foreignKey: 'userId', as: 'ofertasEmpleo' });
+
+export default User;

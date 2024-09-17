@@ -23,7 +23,10 @@ export default function UserPage({ params }) {
     const [jobs, setJobs] = useState([]);
     const [filteredJobs, setFilteredJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState(null);
-    const [activeTab, setActiveTab] = useState('oferta'); // Pestañas para alternar entre detalles de la oferta y la empresa
+    const [loading, setLoading] = useState(false);  // Estado para la carga del botón "Aplicar"
+    const [error, setError] = useState(null);      // Manejo de errores
+    const [success, setSuccess] = useState(false); // Manejo de éxito en la aplicación
+    const [activeTab, setActiveTab] = useState('oferta');  // Pestañas para alternar entre detalles de la oferta y la empresa
 
     // Filtros
     const [searchTermUbicacion, setSearchTermUbicacion] = useState("");
@@ -146,30 +149,116 @@ export default function UserPage({ params }) {
         setActiveTab('oferta'); // Restablecer a la pestaña "Oferta" al seleccionar un nuevo trabajo
     };
 
-    const renderOfferDetails = () => (
-        <>
-            <div className="mt-6">
-                <h3 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
-                    Descripción del trabajo
-                </h3>
+    const handleApply = async () => {
+        setLoading(true);  // Indicar que se está enviando la solicitud
+        setError(null);    // Resetear posibles errores previos
+        setSuccess(false); // Resetear el estado de éxito
 
-                <p className="mt-6 text-gray-700 leading-relaxed text-md text-justify">
-                    {selectedJob.descripcion}
-                </p>
-            </div>
+        try {
+            const response = await fetch('/api/candidatura/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usuarioId: userId,  // Usar el userId del contexto actual
+                    ofertaEmpleoId: selectedJob.id,  // ID de la oferta seleccionada
+                }),
+            });
 
-            <button
-                className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-200 shadow-lg">
-                Aplicar ahora
-            </button>
-        </>
-    );
+            const data = await response.json();
+
+            if (data.success) {
+                setSuccess(true);  // Aplicación exitosa
+            } else {
+                setError(data.message || 'Hubo un problema al aplicar');
+            }
+        } catch (err) {
+            console.error(err);
+            setError('Hubo un error al conectarse con el servidor');
+        } finally {
+            setLoading(false); // Terminar el estado de carga
+        }
+    };
+
+    const renderOfferDetails = () => {
+        if (!selectedJob) {
+            return <p>No hay detalles disponibles para esta oferta.</p>;
+        }
+
+        return (
+            <>
+                <div className="mt-6 h-[330px] overflow-y-auto pr-4"> {/* Ajusta la altura según necesites */}
+                    <h3 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
+                        Descripción del trabajo
+                    </h3>
+
+                    <p className="mt-6 text-gray-700 leading-relaxed text-md text-justify">
+                        {selectedJob.descripcion || "Descripción no disponible"}
+                    </p>
+
+                    <h3 className="text-xl md:text-2xl font-semibold mt-6 text-gray-800">
+                        Funciones Requeridas
+                    </h3>
+
+                    <p className="mt-3 text-gray-700 leading-relaxed text-md text-justify">
+                        {selectedJob.Funciones_Requerimiento || "Funciones no disponibles"}
+                    </p>
+
+                    <h3 className="text-xl md:text-2xl font-semibold mt-6 text-gray-800">
+                        Estudios Requeridos
+                    </h3>
+
+                    <p className="mt-3 text-gray-700 leading-relaxed text-md text-justify">
+                        {selectedJob.Estudios_Requerimiento || "Estudios no disponibles"}
+                    </p>
+
+                    <h3 className="text-xl md:text-2xl font-semibold mt-6 text-gray-800">
+                        Experiencia Requerida
+                    </h3>
+
+                    <p className="mt-3 text-gray-700 leading-relaxed text-md text-justify">
+                        {selectedJob.Experiencia_Requerimiento || "Experiencia no disponible"}
+                    </p>
+
+                    <h3 className="text-xl md:text-2xl font-semibold mt-6 text-gray-800">
+                        Conocimientos Requeridos
+                    </h3>
+
+                    <p className="mt-3 text-gray-700 leading-relaxed text-md text-justify">
+                        {selectedJob.Conocimientos_Requerimiento || "Conocimientos no disponibles"}
+                    </p>
+
+                    <h3 className="text-xl md:text-2xl font-semibold mt-6 text-gray-800">
+                        Competencias Requeridas
+                    </h3>
+
+                    <p className="mt-3 text-gray-700 leading-relaxed text-md text-justify">
+                        {selectedJob.Competencias__Requerimiento || "Competencias no disponibles"}
+                    </p>
+                </div>
+
+                {/* Cambia el botón según el estado de success */}
+                <button
+                    className={`mt-8 w-full ${success ? 'bg-green-400' : 'bg-black hover:bg-blue-700'} 
+                    text-white px-8 py-4 rounded-full text-lg font-semibold transition duration-200 shadow-lg sticky bottom-4`}
+                    onClick={handleApply}
+                    disabled={loading || success}  // Deshabilitar si está cargando o si ya aplicó
+                >
+                    {success ? '¡Aplicaste exitosamente a esta plaza!' : loading ? 'Aplicando...' : 'Aplicar ahora'}
+                </button>
+
+                {error && <p className="text-red-500 mt-4">{error}</p>}
+            </>
+        );
+    };
+
 
     const renderCompanyDetails = () => (
         <>
             {selectedJob.empresa ? (
                 <div className="mt-12 space-y-2">
-                    <h3 className="text-4xl font-bold text-gray-800">
+                    <h3 className="text-3xl font-bold text-gray-800">
                         <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 "/>
                         Información de la Empresa
                     </h3>
@@ -234,7 +323,7 @@ export default function UserPage({ params }) {
                     {/* Add increased spacing before Información de Contacto */}
                     <div className="py-3"></div>
 
-                    <h3 className="text-4xl font-bold  text-gray-800">
+                    <h3 className="text-3xl font-bold  text-gray-800">
                         <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 mb-1 "/>
                         Información de Contacto
                     </h3>

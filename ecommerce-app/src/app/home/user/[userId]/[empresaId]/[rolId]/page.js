@@ -30,126 +30,16 @@ export default function UserPage({ params }) {
     const [companyOfferCount, setCompanyOfferCount] = useState(0);
     const [activeJobCount, setActiveJobCount] = useState(0);
     const [inactiveJobCount, setInactiveJobCount] = useState(0);
-    const [activeTab, setActiveTab] = useState("pending"); // Controla la pestaña activa
-
+    const [activeTab, setActiveTab] = useState("pending");
+    const [pendingCandidates, setPendingCandidates] = useState([]);
+    const [historyCandidates, setHistoryCandidates] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const router = useRouter();
 
     const handleCreateOfferClick = () => {
         router.push(`/home/user/${userId}/${empresaId}/${rolId}/create_offer`);
     };
-
-
-    // Datos ficticios para candidatos pendientes y para historial
-    const pendingCandidates = [
-        {
-            jobTitle: "Desarrollador Full-Stack",
-            salary: 15000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Carlos Méndez",
-            tags: ["Full Time", "1 Year Experience"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-        {
-            jobTitle: "Diseñador UI/UX",
-            salary: 12000,
-            candidatePhoto: "/images/Profile.jpg",
-            candidateName: "Ana Martínez",
-            tags: ["Part Time", "Senior"],
-            status: "Pending",
-        },
-    ];
-
-    const historyCandidates = [
-        {
-            jobTitle: "Analista de Datos",
-            salary: 18000,
-            candidatePhoto: "/images/candidate3.jpg",
-            candidateName: "Luis Ramírez",
-            tags: ["Full Time", "2 Years Experience"],
-            status: "Accepted",
-        },
-        {
-            jobTitle: "Desarrollador Backend",
-            salary: 16000,
-            candidatePhoto: "/images/candidate4.jpg",
-            candidateName: "María González",
-            tags: ["Full Time", "5 Years Experience"],
-            status: "Declined",
-        },
-    ];
 
 
     useEffect(() => {
@@ -176,6 +66,28 @@ export default function UserPage({ params }) {
             }
         };
 
+        const fetchCandidatos = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(`/api/empresa/${empresaId}/candidatos`);
+                const data = await res.json();
+
+                if (data.success) {
+                    const pending = data.candidatos.filter(c => c.estado === 'pendiente');
+                    const history = data.candidatos.filter(c => c.estado !== 'pendiente');
+                    setPendingCandidates(pending);
+                    setHistoryCandidates(history);
+                } else {
+                    console.error('Error al obtener candidatos:', data.message);
+                }
+            } catch (error) {
+                console.error('Error al obtener candidatos:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+
         const fetchJobOffers = async () => {
             try {
                 const res = await fetch(`/api/ofertas?empresaId=${empresaId}&userId=${userId}`);
@@ -199,7 +111,32 @@ export default function UserPage({ params }) {
 
         fetchUsername();
         fetchJobOffers();
+        fetchCandidatos();
     }, [userId, empresaId, router]);
+
+    // Manejo de actualización del estado del candidato (aceptado o rechazado)
+    const handleUpdateCandidato = async (candidatoOfertaId, estado) => {
+        try {
+            const res = await fetch(`/api/empresa/${empresaId}/candidatos/${candidatoOfertaId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ estado }),
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                // Actualizar el estado del candidato en el frontend
+                setPendingCandidates(prev => prev.filter(c => c.id !== candidatoOfertaId));
+                setHistoryCandidates(prev => [...prev, { ...pendingCandidates.find(c => c.id === candidatoOfertaId), estado }]);
+            } else {
+                console.error('Error al actualizar candidato:', data.message);
+            }
+        } catch (error) {
+            console.error('Error al actualizar candidato:', error);
+        }
+    };
 
     const filteredOffers = jobOffers
         .filter((offer) =>
@@ -297,6 +234,98 @@ export default function UserPage({ params }) {
         const diferenciaDias = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)); // Convertir a días
         return diferenciaDias;
     };
+
+    const PendingCandidatesTable = ({ candidates, onUpdateCandidato }) => (
+        <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border">
+                <thead>
+                <tr className="bg-gray-100 text-gray-600 uppercase text-sm">
+                    <th className="py-3 px-6 text-left">Nombre del Puesto</th>
+                    <th className="py-3 px-6 text-left">Salario</th>
+                    <th className="py-3 px-6 text-left">Foto</th>
+                    <th className="py-3 px-6 text-left">Candidato</th>
+                    <th className="py-3 px-6 text-left">Acciones</th>
+                </tr>
+                </thead>
+                <tbody className="text-gray-600">
+                {candidates.map((candidate) => (
+                    <tr key={candidate.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-6">{candidate.ofertaEmpleo.titulo}</td>
+                        <td className="py-3 px-6">Q{candidate.ofertaEmpleo.salario.toLocaleString()}</td>
+                        <td className="py-3 px-6">
+                            <img
+                                src={candidate.candidato.foto || '/images/Profile.jpg'}  // Usa la foto del candidato o una imagen predeterminada
+                                alt={candidate.candidato.username}
+                                className="h-10 w-10 rounded-full"
+                            />
+
+                        </td>
+                        <td className="py-3 px-6">{candidate.candidato.username}</td>
+                        <td className="py-3 px-6 flex space-x-2">
+                            <button
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                                onClick={() => onUpdateCandidato(candidate.id, 'aceptada')}
+                            >
+                                Aceptar
+                            </button>
+                            <button
+                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                                onClick={() => onUpdateCandidato(candidate.id, 'rechazada')}
+                            >
+                                Rechazar
+                            </button>
+                        </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
+    );
+
+    const HistoryCandidatesTable = ({ candidates }) => (
+        <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border">
+                <thead>
+                <tr className="bg-gray-100 text-gray-600 uppercase text-sm">
+                    <th className="py-3 px-6 text-left">Nombre del Puesto</th>
+                    <th className="py-3 px-6 text-left">Salario</th>
+                    <th className="py-3 px-6 text-left">Foto</th>
+                    <th className="py-3 px-6 text-left">Candidato</th>
+                    <th className="py-3 px-6 text-left">Estatus</th>
+                </tr>
+                </thead>
+                <tbody className="text-gray-600">
+                {candidates.map((candidate) => (
+                    <tr key={candidate.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-6">{candidate.ofertaEmpleo.titulo}</td>
+                        <td className="py-3 px-6">Q{candidate.ofertaEmpleo.salario.toLocaleString()}</td>
+                        <td className="py-3 px-6">
+                            <img
+                                src={candidate.candidato.foto || '/images/Profile.jpg'}  // Usa la foto del candidato o una imagen predeterminada
+                                alt={candidate.candidato.username}
+                                className="h-10 w-10 rounded-full"
+                            />
+                        </td>
+                        <td className="py-3 px-6">{candidate.candidato.username}</td>
+                        <td className="py-3 px-6">
+              <span
+                  className={`px-3 py-1 rounded-full text-xs ${
+                      candidate.estado === 'aceptada'
+                          ? 'bg-green-500 text-white'
+                          : 'bg-red-500 text-white'
+                  }`}
+              >
+                {candidate.estado === 'aceptada' ? 'Aceptado' : 'Rechazado'}
+              </span>
+                        </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
+    );
+
+
 
 
     const settings = {
@@ -611,237 +640,157 @@ export default function UserPage({ params }) {
                                 : "resultados encontrados"}
                         </div>
 
-                        <div className="flex flex-wrap justify-between mb-4">
+                    <div className="flex flex-wrap justify-between mb-4">
 
-                            <div className="w-full md:w-1/3 pr-4">
-                                <h2 className="text-2xl font-semibold text-gray-800 mt-8">Plazas Creadas</h2>
-                                <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
-                                    próximo reto</p>
+                        <div className="w-full md:w-1/3 pr-4">
+                            <h2 className="text-2xl font-semibold text-gray-800 mt-8">Plazas Creadas</h2>
+                            <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
+                                próximo reto</p>
 
-                                {filteredOffers.length === 0 ? (
-                                    <p className="text-gray-600 border border-gray-200 p-3 mt-4 rounded-md">No se
-                                        encontraron
-                                        ofertas de trabajo.</p>
-                                ) : (
-                                    <Slider {...settings}>
-                                        {filteredOffers.map((offer) => (
-                                            <div key={offer.id} className="p-2 mt-4">
-                                                <div
-                                                    className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300 ease-in-out relative">
+                            {filteredOffers.length === 0 ? (
+                                <p className="text-gray-600 border border-gray-200 p-3 mt-4 rounded-md">No se
+                                    encontraron
+                                    ofertas de trabajo.</p>
+                            ) : (
+                                <Slider {...settings}>
+                                    {filteredOffers.map((offer) => (
+                                        <div key={offer.id} className="p-2 mt-4">
+                                            <div
+                                                className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300 ease-in-out relative">
 
-                                                    {/* Icono, Título y Menú */}
-                                                    <div className="flex items-center justify-between mb-4">
-                                                        <div className="flex items-center">
-                                                            <div
-                                                                className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
+                                                {/* Icono, Título y Menú */}
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex items-center">
+                                                        <div
+                                                            className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
                                                             <span
                                                                 className="text-lg font-bold text-white">{offer.titulo.charAt(0)}</span>
-                                                            </div>
-                                                            {/* Título */}
-                                                            <div className="mt-6 mb-4">
-                                                                <p className="text-lg font-semibold text-gray-900 ml-4 truncate">
-                                                                    {offer.titulo.length > 20 ? `${offer.titulo.substring(0, 20)}...` : offer.titulo}
-                                                                </p>
-                                                            </div>
                                                         </div>
-
-                                                        {/* Iconos de Editar y Eliminar */}
-                                                        <div className="flex space-x-2">
-                                                            <button
-                                                                onClick={() => router.push(`/home/user/${userId}/${empresaId}/${rolId}/offers/edit/${offer.id}`)}
-                                                                className="text-blue-600 hover:text-blue-800 transition">
-                                                                <PencilIcon className="h-5 w-5"/>
-                                                            </button>
-                                                            <button onClick={() => handleDeleteOffer(offer.id)}
-                                                                    className="text-red-600 hover:text-red-800 transition">
-                                                                <TrashIcon className="h-5 w-5"/>
-                                                            </button>
+                                                        {/* Título */}
+                                                        <div className="mt-6 mb-4">
+                                                            <p className="text-lg font-semibold text-gray-900 ml-4 truncate">
+                                                                {offer.titulo.length > 20 ? `${offer.titulo.substring(0, 20)}...` : offer.titulo}
+                                                            </p>
                                                         </div>
                                                     </div>
 
-                                                    {/* Descripción */}
-                                                    <p className="text-gray-600 mb-4 text-md leading-tight">
-                                                        {offer.descripcion.length > 100 ? `${offer.descripcion.substring(0, 100)}...` : offer.descripcion}
-                                                    </p>
-
-                                                    {/* Modalidad */}
-                                                    <p className="text-gray-600 mb-4 text-md leading-tight">
-                                                        Modalidad: {offer.modalidad}
-                                                    </p>
-
-                                                    {/* Tipo de Empleo */}
-                                                    <p className="text-gray-600 mb-4 text-md leading-tight">
-                                                        Tipo de empleo: {offer.tipoTrabajo}
-                                                    </p>
-
-                                                    {/* Salario */}
-                                                    <div
-                                                        className="text-md font-bold text-gray-600 mb-4">{`Q${parseFloat(offer.salario).toLocaleString()}`}</div>
-
-                                                    {/* Etiquetas */}
-                                                    <div className="mt-6 flex flex-wrap gap-2">
-                                                        {/* Mostrar los tags de la oferta */}
-                                                        {offer.tags && (
-                                                            (Array.isArray(offer.tags) ? offer.tags : offer.tags.split(',')).map((tag, index) => (
-                                                                <span key={index}
-                                                                      className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded">
-                {tag.trim()}
-            </span>
-                                                            ))
-                                                        )}
-                                                    </div>
-
-                                                    {/* Botones fijos */}
-                                                    <div className="flex space-x-2 mt-6 border-t border-gray-200 pt-4">
+                                                    {/* Iconos de Editar y Eliminar */}
+                                                    <div className="flex space-x-2">
                                                         <button
-                                                            className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                                            Revisar Candidatos
+                                                            onClick={() => router.push(`/home/user/${userId}/${empresaId}/${rolId}/offers/edit/${offer.id}`)}
+                                                            className="text-blue-600 hover:text-blue-800 transition">
+                                                            <PencilIcon className="h-5 w-5"/>
                                                         </button>
-                                                        <button
-                                                            onClick={() => handleToggleStatus(offer.id, offer.estatus)}
-                                                            className={`px-4 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${offer.estatus === "Activo" ? "bg-red-600 text-white hover:bg-red-700" : "bg-green-600 text-white hover:bg-green-700"}`}
-                                                        >
-                                                            {offer.estatus === "Activo" ? "Desactivar Trabajo" : "Activar Trabajo"}
+                                                        <button onClick={() => handleDeleteOffer(offer.id)}
+                                                                className="text-red-600 hover:text-red-800 transition">
+                                                            <TrashIcon className="h-5 w-5"/>
                                                         </button>
-
-
                                                     </div>
                                                 </div>
+
+                                                {/* Descripción */}
+                                                <p className="text-gray-600 mb-4 text-md leading-tight">
+                                                    {offer.descripcion.length > 100 ? `${offer.descripcion.substring(0, 100)}...` : offer.descripcion}
+                                                </p>
+
+                                                {/* Modalidad */}
+                                                <p className="text-gray-600 mb-4 text-md leading-tight">
+                                                    Modalidad: {offer.modalidad}
+                                                </p>
+
+                                                {/* Tipo de Empleo */}
+                                                <p className="text-gray-600 mb-4 text-md leading-tight">
+                                                    Tipo de empleo: {offer.tipoTrabajo}
+                                                </p>
+
+                                                {/* Salario */}
+                                                <div
+                                                    className="text-md font-bold text-gray-600 mb-4">{`Q${parseFloat(offer.salario).toLocaleString()}`}</div>
+
+                                                {/* Etiquetas */}
+                                                <div className="mt-6 flex flex-wrap gap-2">
+                                                    {/* Mostrar los tags de la oferta */}
+                                                    {offer.tags && (
+                                                        (Array.isArray(offer.tags) ? offer.tags : offer.tags.split(',')).map((tag, index) => (
+                                                            <span key={index}
+                                                                  className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded">
+                {tag.trim()}
+            </span>
+                                                        ))
+                                                    )}
+                                                </div>
+
+                                                {/* Botones fijos */}
+                                                <div className="flex space-x-2 mt-6 border-t border-gray-200 pt-4">
+                                                    <button
+                                                        className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                        Revisar Candidatos
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleToggleStatus(offer.id, offer.estatus)}
+                                                        className={`px-4 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${offer.estatus === "Activo" ? "bg-red-600 text-white hover:bg-red-700" : "bg-green-600 text-white hover:bg-green-700"}`}
+                                                    >
+                                                        {offer.estatus === "Activo" ? "Desactivar Trabajo" : "Activar Trabajo"}
+                                                    </button>
+
+
+                                                </div>
                                             </div>
-                                        ))}
-                                    </Slider>
+                                        </div>
+                                    ))}
+                                </Slider>
+                            )}
+                        </div>
+
+                        <div className="w-full md:w-2/3 pl-4 ">
+                            <h2 className="text-2xl font-semibold text-gray-800 mt-7 ">Candidatos</h2>
+                            <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
+                                próximo reto</p>
+                            <div className="bg-white p-6 rounded-lg shadow-lg mt-6 border border-gray-200">
+                                {/* Pestañas */}
+                                <div className="flex space-x-4 mb-6 border-b-2 border-gray-200">
+                                    <button
+                                        onClick={() => setActiveTab('pending')}
+                                        className={`py-2 px-4 rounded-t-lg border-b-2 focus:outline-none ${
+                                            activeTab === 'pending' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-400'
+                                        }`}
+                                    >
+                                        Candidatos Pendientes
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('history')}
+                                        className={`py-2 px-4 rounded-t-lg focus:outline-none ${
+                                            activeTab === 'history' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-400'
+                                        }`}
+                                    >
+                                        Historial de Candidatos
+                                    </button>
+                                </div>
+
+                                {loading ? (
+                                    <p>Cargando...</p>
+                                ) : (
+                                    <div className="overflow-y-auto" style={{maxHeight: '580px'}}>
+                                        {activeTab === 'pending' && (
+                                            <PendingCandidatesTable candidates={pendingCandidates}
+                                                                    onUpdateCandidato={handleUpdateCandidato}/>
+                                        )}
+
+                                        {activeTab === 'history' && (
+                                            <HistoryCandidatesTable candidates={historyCandidates}/>
+                                        )}
+                                    </div>
                                 )}
                             </div>
 
 
-
-
-                            {/* Tabla de Candidatos - Derecha */}
-                            <div className="w-full md:w-2/3 pl-4 ">
-
-                                <h2 className="text-2xl font-semibold text-gray-800 mt-7 ">Candidatos</h2>
-                                <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
-                                    próximo reto</p>
-
-                                <div className="bg-white p-6 rounded-lg shadow-lg mt-6 border border-gray-200 ">
-                                    {/* Pestañas */}
-                                    <div className="flex space-x-4 mb-6 border-b-2 border-gray-200">
-                                        <button onClick={() => setActiveTab("pending")}
-                                                className={`py-2 px-4 rounded-t-lg border-b-2 border-gray-200 focus:outline-none ${activeTab === "pending" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-400"}`}>
-                                            Candidatos Pendientes
-                                        </button>
-                                        <button onClick={() => setActiveTab("history")}
-                                                className={`py-2 px-4 rounded-t-lg focus:outline-none ${activeTab === "history" ? "text-blue-600 border-b-4 border-blue-600" : "text-gray-400"}`}>
-                                            Historial de Candidatos
-                                        </button>
-                                    </div>
-
-                                    <div className="overflow-y-auto" style={{maxHeight: '580px'}}>
-
-                                        {/* Tabla de Candidatos Pendientes */}
-                                        {activeTab === "pending" && (
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full bg-white border">
-                                                    <thead>
-                                                    <tr className="bg-gray-100 text-gray-600 uppercase text-sm">
-                                                        <th className="py-3 px-6 text-left">Nombre del Puesto</th>
-                                                        <th className="py-3 px-6 text-left">Salario</th>
-                                                        <th className="py-3 px-6 text-left">Foto</th>
-                                                        <th className="py-3 px-6 text-left">Candidato</th>
-                                                        <th className="py-3 px-6 text-left">Tags</th>
-                                                        <th className="py-3 px-6 text-left">Acciones</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody className="text-gray-600">
-                                                    {pendingCandidates.map((candidate, index) => (
-                                                        <tr key={index} className="border-b hover:bg-gray-50">
-                                                            <td className="py-3 px-6">{candidate.jobTitle}</td>
-                                                            <td className="py-3 px-6">Q{candidate.salary.toLocaleString()}</td>
-                                                            <td className="py-3 px-6">
-                                                                <img src={candidate.candidatePhoto}
-                                                                     alt={candidate.candidateName}
-                                                                     className="h-10 w-10 rounded-full"/>
-                                                            </td>
-                                                            <td className="py-3 px-6">{candidate.candidateName}</td>
-                                                            <td className="py-3 px-6">
-                                                                {candidate.tags.map((tag, i) => (
-                                                                    <span key={i}
-                                                                          className="bg-gray-200 text-gray-700 px-2 py-1 text-xs rounded-full mr-1">
-                        {tag}
-                      </span>
-                                                                ))}
-                                                            </td>
-                                                            <td className="py-3 px-6 flex space-x-2">
-                                                                <button
-                                                                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Aceptar
-                                                                </button>
-                                                                <button
-                                                                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Rechazar
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-
-                                        {/* Tabla de Historial de Candidatos */}
-                                        {activeTab === "history" && (
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full bg-white border">
-                                                    <thead>
-                                                    <tr className="bg-gray-100 text-gray-600 uppercase text-sm">
-                                                        <th className="py-3 px-6 text-left">Nombre del Puesto</th>
-                                                        <th className="py-3 px-6 text-left">Salario</th>
-                                                        <th className="py-3 px-6 text-left">Foto</th>
-                                                        <th className="py-3 px-6 text-left">Candidato</th>
-                                                        <th className="py-3 px-6 text-left">Tags</th>
-                                                        <th className="py-3 px-6 text-left">Estatus</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody className="text-gray-600">
-                                                    {historyCandidates.map((candidate, index) => (
-                                                        <tr key={index} className="border-b hover:bg-gray-50">
-                                                            <td className="py-3 px-6">{candidate.jobTitle}</td>
-                                                            <td className="py-3 px-6">Q{candidate.salary.toLocaleString()}</td>
-                                                            <td className="py-3 px-6">
-                                                                <img src={candidate.candidatePhoto}
-                                                                     alt={candidate.candidateName}
-                                                                     className="h-10 w-10 rounded-full"/>
-                                                            </td>
-                                                            <td className="py-3 px-6">{candidate.candidateName}</td>
-                                                            <td className="py-3 px-6">
-                                                                {candidate.tags.map((tag, i) => (
-                                                                    <span key={i}
-                                                                          className="bg-gray-200 text-gray-700 px-2 py-1 text-xs rounded-full mr-1">
-                        {tag}
-                      </span>
-                                                                ))}
-                                                            </td>
-                                                            <td className="py-3 px-6">
-                    <span
-                        className={`px-3 py-1 rounded-full text-xs ${candidate.status === "Accepted" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
-                      {candidate.status === "Accepted" ? "Aceptado" : "Rechazado"}
-                    </span>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-
-
                     </div>
+                </div>
 
 
             </main>
         </div>
-);
+    );
 }
 
