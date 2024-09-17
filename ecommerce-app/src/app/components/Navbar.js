@@ -56,7 +56,7 @@ export default function Navbar({ userId, empresaId, rolId }) {
                     setIsInCompany(companyData.isInCompany);
 
                     // Verificar si el usuario ya tiene un CV
-                    const endpoint = `/api/user/${userId}/getCV`; // El nuevo endpoint consolidado
+                    const endpoint = `/api/user/${userId}/getCV`;
 
                     const response = await fetch(endpoint, {
                         headers: {
@@ -67,7 +67,7 @@ export default function Navbar({ userId, empresaId, rolId }) {
                     if (response.success) {
                         const { habilidades, idiomas, experiencias, educaciones, certificaciones } = response.data;
 
-                        // Verificar si existe algún dato
+                        // Verificar si existe algún dato en el CV
                         const hasAnyData =
                             habilidades.length > 0 ||
                             idiomas.length > 0 ||
@@ -77,7 +77,6 @@ export default function Navbar({ userId, empresaId, rolId }) {
 
                         setHasCV(hasAnyData);
                     } else {
-                        // Manejar el caso de error
                         console.error('Error fetching CV data:', response.message);
                     }
 
@@ -108,6 +107,7 @@ export default function Navbar({ userId, empresaId, rolId }) {
         empresaId && rolId
             ? `/home/user/${userId}/${empresaId}/${rolId}`
             : `/home/user/${userId}`;
+
 
     const isDashboard = pathname === dashboardHref;
     const handleNavigation = () => {
@@ -198,7 +198,8 @@ export default function Navbar({ userId, empresaId, rolId }) {
                 </Link>
 
                 {/* Botón Crear/Modificar CV */}
-                {!isInCompany && (
+                {/* Solo muestra si NO es perfil de empresa (empresaId y rolId no están presentes) */}
+                {!isInCompany && !empresaId && !rolId && pathname.startsWith(`/home/user/${userId}`) && (
                     <button
                         onClick={handleNavigation}
                         className="flex items-center space-x-2 hover:text-blue-600 transition"

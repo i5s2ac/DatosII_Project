@@ -13,7 +13,6 @@ import withReactContent from 'sweetalert2-react-content';
 import { CalendarIcon, CurrencyDollarIcon, BriefcaseIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
-
 const MySwal = withReactContent(Swal);
 
 export default function UserPage({ params }) {
@@ -40,7 +39,6 @@ export default function UserPage({ params }) {
     const handleCreateOfferClick = () => {
         router.push(`/home/user/${userId}/${empresaId}/${rolId}/create_offer`);
     };
-
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -86,7 +84,6 @@ export default function UserPage({ params }) {
                 setLoading(false);
             }
         };
-
 
         const fetchJobOffers = async () => {
             try {
@@ -162,8 +159,8 @@ export default function UserPage({ params }) {
             typeFilter ? offer.tipoTrabajo.includes(typeFilter) : true
         )
         .filter((offer) =>
-                modalityFilter ? offer.modalidad.includes(modalityFilter) : true
-            );
+            modalityFilter ? offer.modalidad.includes(modalityFilter) : true
+        );
 
     // Función para eliminar una oferta con SweetAlert2
     const handleDeleteOffer = async (offerId) => {
@@ -327,8 +324,7 @@ export default function UserPage({ params }) {
 
 
 
-
-    const settings = {
+const settings = {
         dots: true,
         infinite: false,
         speed: 500,

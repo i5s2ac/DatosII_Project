@@ -11,6 +11,22 @@ export default async function handler(req, res) {
         }
 
         try {
+            // Verificar si el usuario ya ha aplicado a esta oferta
+            const candidaturaExistente = await CandidatoOferta.findOne({
+                where: {
+                    usuarioId,
+                    ofertaEmpleoId,
+                },
+            });
+
+            if (candidaturaExistente) {
+                // Si el usuario ya ha aplicado, devolver un error
+                return res.status(400).json({
+                    success: false,
+                    message: 'Ya has aplicado a esta oferta de empleo'
+                });
+            }
+
             // Crear una nueva entrada en CandidatoOferta
             const nuevaCandidatura = await CandidatoOferta.create({
                 usuarioId,

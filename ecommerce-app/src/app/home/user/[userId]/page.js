@@ -13,7 +13,10 @@ import {
     PhoneIcon,
     GlobeAltIcon,
     EnvelopeIcon,
-    BuildingOfficeIcon
+    BuildingOfficeIcon,
+    DocumentIcon,
+    LightBulbIcon,
+    PuzzlePieceIcon
 } from '@heroicons/react/24/outline';
 import Link from "next/link";
 
@@ -26,6 +29,7 @@ export default function UserPage({ params }) {
     const [loading, setLoading] = useState(false);  // Estado para la carga del botón "Aplicar"
     const [error, setError] = useState(null);      // Manejo de errores
     const [success, setSuccess] = useState(false); // Manejo de éxito en la aplicación
+    const [solicitudEstado, setSolicitudEstado] = useState(null); // Estado de la solicitud del usuario
     const [activeTab, setActiveTab] = useState('oferta');  // Pestañas para alternar entre detalles de la oferta y la empresa
 
     // Filtros
@@ -39,35 +43,34 @@ export default function UserPage({ params }) {
     const router = useRouter();
 
     useEffect(() => {
-        // Fetch del username dentro del useEffect
         const fetchUsername = async () => {
             try {
-                const token = localStorage.getItem('token'); // Asegúrate de que el token esté almacenado en localStorage
+                const token = localStorage.getItem('token');
                 if (!token) {
-                    throw new Error("Token no encontrado");
+                    throw new Error('Token no encontrado');
                 }
                 const res = await fetch(`/api/user/${userId}`, {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Asegúrate de enviar el token correctamente
+                        Authorization: `Bearer ${token}`,
                     },
                 });
                 const data = await res.json();
                 if (data.success) {
                     setUsername(data.user.username);
                 } else {
-                    router.push("/auth/login"); // Redirigir si no es exitoso
+                    router.push('/auth/login');
                 }
             } catch (error) {
-                console.error("Error fetching username:", error);
-                router.push("/auth/login");
+                console.error('Error fetching username:', error);
+                router.push('/auth/login');
             }
         };
 
         fetchUsername();
-    }, [userId, router]); // Agregado router como dependencia
+    }, [userId, router]);
 
+    // Fetch de ofertas de empleo
     useEffect(() => {
-        // Fetch de ofertas de empleo
         const fetchJobs = async () => {
             try {
                 const response = await fetch(`/api/user/${userId}/ofertas`);
@@ -75,7 +78,6 @@ export default function UserPage({ params }) {
                     throw new Error('Error al obtener las ofertas de empleo');
                 }
                 const data = await response.json();
-
                 if (data.success) {
                     setJobs(data.ofertas);
                     setFilteredJobs(data.ofertas); // Inicialmente, todas las ofertas se muestran
@@ -89,6 +91,39 @@ export default function UserPage({ params }) {
 
         fetchJobs();
     }, [userId]);
+
+    // Al seleccionar una oferta, verificar si el usuario ya aplicó
+    const handleJobClick = (job) => {
+        setSelectedJob(job);
+        setActiveTab('oferta'); // Restablecer a la pestaña "Oferta" al seleccionar un nuevo trabajo
+
+        const fetchSolicitudEstado = async () => {
+            try {
+                const response = await fetch('/api/candidatura/estado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usuarioId: userId,
+                        ofertaEmpleoId: job.id,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    setSolicitudEstado(data.estado); // 'pendiente', 'aceptada', 'rechazada', o null
+                } else {
+                    setError(data.message || 'Hubo un problema al verificar el estado de la solicitud');
+                }
+            } catch (error) {
+                console.error('Error al obtener el estado de la solicitud:', error);
+            }
+        };
+
+        fetchSolicitudEstado(); // Ejecutar solo cuando se selecciona un trabajo
+    };
 
     // Aplicación de filtros
     useEffect(() => {
@@ -144,12 +179,13 @@ export default function UserPage({ params }) {
         setFilteredJobs(filtered);
     }, [searchTermUbicacion, searchTermTitulo, dateFilter, salaryFilter, typeFilter, modalityFilter, jobs]);
 
-    const handleJobClick = (job) => {
-        setSelectedJob(job);
-        setActiveTab('oferta'); // Restablecer a la pestaña "Oferta" al seleccionar un nuevo trabajo
+    const handleViewCVClick = () => {
+        router.push(`/home/user/${userId}/CV`);
     };
 
     const handleApply = async () => {
+        if (solicitudEstado) return; // Si ya ha aplicado, no hacer nada
+
         setLoading(true);  // Indicar que se está enviando la solicitud
         setError(null);    // Resetear posibles errores previos
         setSuccess(false); // Resetear el estado de éxito
@@ -170,14 +206,56 @@ export default function UserPage({ params }) {
 
             if (data.success) {
                 setSuccess(true);  // Aplicación exitosa
+                setSolicitudEstado('pendiente'); // Cambiar el estado de la solicitud a 'pendiente'
             } else {
-                setError(data.message || 'Hubo un problema al aplicar');
+                setError(data.message || 'Hubo un problema al aplicar');  // Mostrar el mensaje de error
             }
         } catch (err) {
             console.error(err);
             setError('Hubo un error al conectarse con el servidor');
         } finally {
             setLoading(false); // Terminar el estado de carga
+        }
+    };
+
+    const renderApplyButton = () => {
+        if (solicitudEstado === 'pendiente') {
+            return (
+                <button
+                    className="bg-yellow-500 text-white w-full py-3 rounded-lg"
+                    disabled
+                >
+                    Solicitud Pendiente
+                </button>
+            );
+        } else if (solicitudEstado === 'aceptada') {
+            return (
+                <button
+                    className="bg-green-500 text-white w-full py-3 rounded-lg"
+                    disabled
+                >
+                    Solicitud Aceptada
+                </button>
+            );
+        } else if (solicitudEstado === 'rechazada') {
+            return (
+                <button
+                    className="bg-red-500 text-white w-full py-3 rounded-lg"
+                    disabled
+                >
+                    Solicitud Rechazada
+                </button>
+            );
+        } else {
+            return (
+                <button
+                    onClick={handleApply}
+                    className="bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={loading}
+                >
+                    {loading ? "Aplicando..." : "Aplicar"}
+                </button>
+            );
         }
     };
 
@@ -188,7 +266,7 @@ export default function UserPage({ params }) {
 
         return (
             <>
-                <div className="mt-6 h-[330px] overflow-y-auto pr-4"> {/* Ajusta la altura según necesites */}
+                <div className="mt-6 h-[330px] overflow-y-auto pr-4">
                     <h3 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
                         Descripción del trabajo
                     </h3>
@@ -238,21 +316,11 @@ export default function UserPage({ params }) {
                     </p>
                 </div>
 
-                {/* Cambia el botón según el estado de success */}
-                <button
-                    className={`mt-8 w-full ${success ? 'bg-green-400' : 'bg-black hover:bg-blue-700'} 
-                    text-white px-8 py-4 rounded-full text-lg font-semibold transition duration-200 shadow-lg sticky bottom-4`}
-                    onClick={handleApply}
-                    disabled={loading || success}  // Deshabilitar si está cargando o si ya aplicó
-                >
-                    {success ? '¡Aplicaste exitosamente a esta plaza!' : loading ? 'Aplicando...' : 'Aplicar ahora'}
-                </button>
-
+                {renderApplyButton()} {/* Mostrar el botón adecuado según el estado */}
                 {error && <p className="text-red-500 mt-4">{error}</p>}
             </>
         );
     };
-
 
     const renderCompanyDetails = () => (
         <>
@@ -265,11 +333,11 @@ export default function UserPage({ params }) {
 
                     <div className="flex items-center space-x-3 text-gray-700">
                         <p className="text-lg font-medium leading-relaxed">
-                            Aquí puedes consultar todos los detalles sobre la empresa que está ofreciendo esta oportunidad de trabajo.
+                            Aquí puedes consultar todos los detalles sobre la empresa que está ofreciendo esta
+                            oportunidad de trabajo.
                         </p>
                     </div>
 
-                    {/* Nombre */}
                     <div className="p-6 bg-white text-blue-800 rounded-xl shadow-md flex items-center space-x-4">
                         <BuildingOfficeIcon className="h-6 w-6"/>
                         <div>
@@ -280,7 +348,6 @@ export default function UserPage({ params }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        {/* Descripción */}
                         <div className="p-6 bg-white text-yellow-800 rounded-xl shadow-md flex items-center space-x-4">
                             <BuildingOfficeIcon className="h-6 w-6"/>
                             <div>
@@ -289,7 +356,6 @@ export default function UserPage({ params }) {
                             </div>
                         </div>
 
-                        {/* Dirección */}
                         <div className="p-6 bg-white text-green-800 rounded-xl shadow-md flex items-center space-x-4">
                             <MapPinIcon className="h-6 w-6"/>
                             <div>
@@ -300,7 +366,6 @@ export default function UserPage({ params }) {
 
                     </div>
 
-                    {/* Sitio Web */}
                     <div className="p-6 bg-white text-indigo-800 rounded-xl shadow-md flex items-center space-x-4">
                         <GlobeAltIcon className="h-6 w-6"/>
                         <div>
@@ -320,8 +385,9 @@ export default function UserPage({ params }) {
                         </div>
                     </div>
 
-                    {/* Add increased spacing before Información de Contacto */}
-                    <div className="py-3"></div>
+                    <div className="py-3">
+                    </div>
+
 
                     <h3 className="text-3xl font-bold  text-gray-800">
                         <BuildingOfficeIcon className="h-8 w-8 inline-block text-blue-600 mr-3 mb-1 "/>
@@ -330,13 +396,12 @@ export default function UserPage({ params }) {
 
                     <div className="flex items-center space-x-3 text-gray-700">
                         <p className="text-lg font-medium leading-relaxed">
-                            Aquí puedes consultar todos los detalles sobre el creador de la oportunidad de trabajo.
+                            Aquí puedes consultar todos los detalles sobre el creador de la plaza.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        {/* Teléfono */}
                         <div className="p-6 bg-white text-red-800 rounded-xl shadow-md flex items-center space-x-4">
                             <PhoneIcon className="h-6 w-6"/>
                             <div>
@@ -345,7 +410,6 @@ export default function UserPage({ params }) {
                             </div>
                         </div>
 
-                        {/* Email */}
                         <div className="p-6 bg-white text-purple-800 rounded-xl shadow-md flex items-center space-x-4">
                             <EnvelopeIcon className="h-6 w-6"/>
                             <div>
@@ -363,7 +427,6 @@ export default function UserPage({ params }) {
         </>
     );
 
-
     return (
         <Layout userId={userId}>
             <div className="min-h-screen flex flex-col bg-white">
@@ -372,7 +435,7 @@ export default function UserPage({ params }) {
                         className="flex justify-between items-center mb-6 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
                         <div className="flex items-center space-x-4">
                             <img
-                                src="/images/Profile.jpg"  // Ruta de la imagen de perfil
+                                src="/images/Profile.jpg"
                                 alt="Profile Picture"
                                 className="h-14 w-14 rounded-full border-2 border-gray-200 object-cover"
                             />
@@ -380,7 +443,6 @@ export default function UserPage({ params }) {
                                 <h1 className="text-2xl font-medium text-gray-900">
                                     ¡Hola, {username}!
                                 </h1>
-
                                 <p className="text-md text-gray-500 mt-1">
                                     Estamos listos para ayudarte a encontrar tu próximo reto
                                 </p>
@@ -396,7 +458,73 @@ export default function UserPage({ params }) {
                             </button>
                         </div>
                     </div>
-                    {/* Barra de búsqueda y filtros */}
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div
+                            className="bg-white rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 relative flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <DocumentIcon className="h-10 w-10 text-green-600"/>
+                                    <h2 className="text-2xl font-semibold text-gray-800">Ver CV</h2>
+                                </div>
+                                <p className="text-gray-600 mb-6 text-lg">
+                                    Visualiza el CV del usuario seleccionado y obtén más información sobre su
+                                    experiencia y habilidades.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={handleViewCVClick}
+                                className="bg-green-600 text-white w-full py-3 rounded-lg hover:bg-green-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                                Ver CV
+                            </button>
+                        </div>
+
+                        <div
+                            className="bg-white rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 relative flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <LightBulbIcon className="h-10 w-10 text-yellow-600"/>
+                                    <h2 className="text-2xl font-semibold text-gray-800">Consejo para Postularte</h2>
+                                </div>
+                                <p className="text-gray-600 mb-6 text-lg">
+                                    Asegúrate de adaptar tu CV y carta de presentación para cada oferta de trabajo.
+                                    Resalta tus logros más
+                                    relevantes y cómo puedes contribuir al éxito de la empresa.
+                                </p>
+                            </div>
+
+                            <button
+                                className="bg-yellow-600 text-white w-full py-3 rounded-lg hover:bg-yellow-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                            >
+                                Aprende más
+                            </button>
+                        </div>
+
+                        <div
+                            className="bg-white rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 relative flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <PuzzlePieceIcon
+                                        className="h-10 w-10 text-blue-600"/>
+                                    <h2 className="text-2xl font-semibold text-gray-800">Consejo para Entrevistas</h2>
+                                </div>
+                                <p className="text-gray-600 mb-6 text-lg">
+                                    Prepárate bien para la entrevista investigando a la empresa y practicando respuestas
+                                    a preguntas
+                                    comunes. Sé puntual y viste de manera adecuada.
+                                </p>
+                            </div>
+
+                            <button
+                                className="bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                Prepárate
+                            </button>
+                        </div>
+                    </div>
+
                     <section className="my-8 max-w-8xl">
                         <form className="mb-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -490,8 +618,6 @@ export default function UserPage({ params }) {
                         <p className="text-gray-500 mb-4">{filteredJobs.length} trabajos encontrados</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                            {/* Lista de trabajos */}
                             <div className="bg-white rounded-lg min-h-[590px] overflow-y-auto">
                                 <div className="space-y-4">
                                     {filteredJobs.length > 0 ? (
@@ -513,7 +639,6 @@ export default function UserPage({ params }) {
                                                             <span
                                                                 className="text-lg font-bold text-white">{job.titulo.charAt(0)}</span>
                                                         </div>
-                                                        {/* Título */}
                                                         <div className="ml-4">
                                                             <p className="text-lg font-semibold text-gray-900 truncate">
                                                                 {job.titulo.length > 20 ? `${job.titulo.substring(0, 20)}...` : job.titulo}
@@ -558,7 +683,6 @@ export default function UserPage({ params }) {
                                 </div>
                             </div>
 
-                            {/* Detalles del trabajo con pestañas */}
                             {selectedJob ? (
                                 <div
                                     className="col-span-1 md:col-span-2 bg-white rounded-lg shadow-lg border border-gray-200 p-6">
@@ -575,14 +699,16 @@ export default function UserPage({ params }) {
                                     </div>
 
                                     <div className="flex py-6 space-x-4">
-                                        <div className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
+                                        <div
+                                            className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
                                             <div className="text-sm">Salario</div>
                                             <div className="text-2xl font-bold">Q{selectedJob.salario} <span
                                                 className="text-base font-normal">/Mes</span>
                                             </div>
                                         </div>
 
-                                        <div className="px-6 py-4 bg-blue-100 text-blue-800 text-center rounded-2xl">
+                                        <div
+                                            className="px-6 py-4 bg-blue-100 text-blue-800 text-center rounded-2xl">
                                             <div className="text-sm">Tipo de Empleo</div>
                                             <div
                                                 className="text-2xl font-bold">{selectedJob.tipoTrabajo || 'Tipo no especificado'}</div>
@@ -602,7 +728,6 @@ export default function UserPage({ params }) {
                                         </div>
                                     </div>
 
-                                    {/* Pestañas */}
                                     <div className="mb-6 border-b border-gray-200">
                                         <nav className="-mb-px flex space-x-8">
 
@@ -629,11 +754,10 @@ export default function UserPage({ params }) {
                                         </nav>
                                     </div>
 
-                                    {/* Contenido de las pestañas */}
                                     {activeTab === 'oferta' ? renderOfferDetails() : renderCompanyDetails()}
                                 </div>
                             ) : (
-                                <div className="col-span-1 md:col-span-3 flex items-center justify-center">
+                                <div className="col-span-1 md:col-span-2  flex items-center justify-center">
                                     <p className="text-gray-500 text-xl">Selecciona una oferta para ver los detalles</p>
                                 </div>
                             )}

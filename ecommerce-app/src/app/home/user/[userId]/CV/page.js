@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt, faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
 
 export default function EditCV({ params }) {
     const { userId } = params;
@@ -449,6 +452,11 @@ export default function EditCV({ params }) {
         }
     };
 
+    const handleGoBack = () => {
+        router.back(); // Volver a la página anterior
+    };
+
+
 
     if (loading) {
         return <p>Cargando datos...</p>;
@@ -456,299 +464,320 @@ export default function EditCV({ params }) {
 
 
     return (
-        <div className="p-8 max-w-4xl mx-auto bg-white shadow-lg rounded-lg">
-            <h1 className="text-3xl font-bold mb-6 text-blue-600">Modificar CV</h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="p-6 max-w-8xl mx-auto bg-white shadow-lg rounded-lg space-y-6">
+            {/* Flecha para regresar */}
+            {/* Flecha para regresar */}
+            <div className="flex items-center mb-6">
+                <button
+                    onClick={handleGoBack}
+                    className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                    <ArrowLeftIcon
+                        className="h-6 w-6 text-gray-700 cursor-pointer hover:text-primary transition"
+                    />
+                    <h2 className="text-2xl font-semibold text-gray-800 ml-4 py-2">Modificar CV</h2>
+                </button>
+            </div>
 
+            {/* Título */}
+
+            {/* Formulario */}
+            <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Experiencia Laboral */}
-                <div className="bg-blue-50 p-6 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-semibold mb-4 text-blue-500">Experiencia Laboral</h2>
-                    {formData.experiencia.map((exp, index) => (
-                        <div key={index} className="mb-4 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
-                            <input
-                                type="text"
-                                name="titulo_puesto"
-                                placeholder="Título del Puesto"
-                                value={exp.titulo_puesto}
-                                onChange={(e) => handleChange(e, 'experiencia', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="text"
-                                name="empresa"
-                                placeholder="Empresa"
-                                value={exp.empresa}
-                                onChange={(e) => handleChange(e, 'experiencia', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="text"
-                                name="ubicacion"
-                                placeholder="Ubicación"
-                                value={exp.ubicacion}
-                                onChange={(e) => handleChange(e, 'experiencia', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="date"
-                                name="fecha_inicio"
-                                placeholder="Fecha de Inicio"
-                                value={exp.fecha_inicio}
-                                onChange={(e) => handleChange(e, 'experiencia', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="date"
-                                name="fecha_fin"
-                                placeholder="Fecha de Fin"
-                                value={exp.fecha_fin}
-                                onChange={(e) => handleChange(e, 'experiencia', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <textarea
-                                name="descripcion"
-                                placeholder="Descripción"
-                                value={exp.descripcion}
-                                onChange={(e) => handleChange(e, 'experiencia', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteExperience('experiencia', index)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-                            >
-                                <i className="fas fa-trash-alt mr-2"></i>
-                                Eliminar Experiencia
-                            </button>
-                        </div>
-                    ))}
+                <section className="bg-blue-50 p-6 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-semibold mb-4 text-blue-600">Experiencia Laboral</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {formData.experiencia.map((exp, index) => (
+                            <div key={index} className="border border-gray-300 p-4 rounded-md bg-white shadow-sm">
+                                <input
+                                    type="text"
+                                    name="titulo_puesto"
+                                    placeholder="Título del Puesto"
+                                    value={exp.titulo_puesto}
+                                    onChange={(e) => handleChange(e, "experiencia", index)}
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                                />
+                                <input
+                                    type="text"
+                                    name="empresa"
+                                    placeholder="Empresa"
+                                    value={exp.empresa}
+                                    onChange={(e) => handleChange(e, "experiencia", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                                />
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <input
+                                        type="date"
+                                        name="fecha_inicio"
+                                        placeholder="Fecha de Inicio"
+                                        value={exp.fecha_inicio}
+                                        onChange={(e) => handleChange(e, "experiencia", index)}
+                                        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                                    />
+                                    <input
+                                        type="date"
+                                        name="fecha_fin"
+                                        placeholder="Fecha de Fin"
+                                        value={exp.fecha_fin}
+                                        onChange={(e) => handleChange(e, "experiencia", index)}
+                                        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                                    />
+                                </div>
+                                <textarea
+                                    name="descripcion"
+                                    placeholder="Descripción"
+                                    value={exp.descripcion}
+                                    onChange={(e) => handleChange(e, "experiencia", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteExperience("experiencia", index)}
+                                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors w-full flex items-center justify-center"
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
+                                    Eliminar Experiencia
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                     <button
                         type="button"
-                        onClick={() => handleAddItem('experiencia')}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors"
+                        onClick={() => handleAddItem("experiencia")}
+                        className="mt-6 bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors w-full flex items-center justify-center"
                     >
-                        <i className="fas fa-plus mr-2"></i>
+                        <FontAwesomeIcon icon={faPlus} className="mr-2" />
                         Agregar Experiencia
                     </button>
-                </div>
+                </section>
 
                 {/* Certificaciones */}
-                <div className="bg-green-50 p-6 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-semibold mb-4 text-green-500">Certificaciones</h2>
-                    {formData.certificaciones.map((cert, index) => (
-                        <div key={index} className="mb-4 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
-                            <input
-                                type="text"
-                                name="nombre"
-                                placeholder="Nombre"
-                                value={cert.nombre}
-                                onChange={(e) => handleChange(e, 'certificaciones', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="text"
-                                name="organizacionEmisora"
-                                placeholder="Organización Emisora"
-                                value={cert.organizacionEmisora}
-                                onChange={(e) => handleChange(e, 'certificaciones', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="date"
-                                name="fechaObtencion"
-                                placeholder="Fecha de Obtención"
-                                value={cert.fechaObtencion}
-                                onChange={(e) => handleChange(e, 'certificaciones', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <textarea
-                                name="descripcion"
-                                placeholder="Descripción"
-                                value={cert.descripcion}
-                                onChange={(e) => handleChange(e, 'certificaciones', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteCert('certificaciones', index)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-                            >
-                                <i className="fas fa-trash-alt mr-2"></i>
-                                Eliminar Certificación
-                            </button>
-                        </div>
-                    ))}
+                <section className="bg-green-50 p-6 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-semibold mb-4 text-green-600">Certificaciones</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {formData.certificaciones.map((cert, index) => (
+                            <div key={index} className="border border-gray-300 p-4 rounded-md bg-white shadow-sm">
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    placeholder="Nombre"
+                                    value={cert.nombre}
+                                    onChange={(e) => handleChange(e, "certificaciones", index)}
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
+                                />
+                                <input
+                                    type="text"
+                                    name="organizacionEmisora"
+                                    placeholder="Organización Emisora"
+                                    value={cert.organizacionEmisora}
+                                    onChange={(e) => handleChange(e, "certificaciones", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
+                                />
+                                <input
+                                    type="date"
+                                    name="fechaObtencion"
+                                    placeholder="Fecha de Obtención"
+                                    value={cert.fechaObtencion}
+                                    onChange={(e) => handleChange(e, "certificaciones", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
+                                />
+                                <textarea
+                                    name="descripcion"
+                                    placeholder="Descripción"
+                                    value={cert.descripcion}
+                                    onChange={(e) => handleChange(e, "certificaciones", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-green-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteCert("certificaciones", index)}
+                                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors w-full flex items-center justify-center"
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
+                                    Eliminar Certificación
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                     <button
                         type="button"
-                        onClick={() => handleAddItem('certificaciones')}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors"
+                        onClick={() => handleAddItem("certificaciones")}
+                        className="mt-6 bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors w-full flex items-center justify-center"
                     >
-                        <i className="fas fa-plus mr-2"></i>
+                        <FontAwesomeIcon icon={faPlus} className="mr-2" />
                         Agregar Certificación
                     </button>
-                </div>
+                </section>
 
                 {/* Educación */}
-                <div className="bg-yellow-50 p-6 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-semibold mb-4 text-yellow-500">Educación</h2>
-                    {formData.educacion.map((edu, index) => (
-                        <div key={index} className="mb-4 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
-                            <input
-                                type="text"
-                                name="gradoObtenido"
-                                placeholder="Título"
-                                value={edu.gradoObtenido}
-                                onChange={(e) => handleChange(e, 'educacion', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="text"
-                                name="institucion"
-                                placeholder="Institución"
-                                value={edu.institucion}
-                                onChange={(e) => handleChange(e, 'educacion', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="date"
-                                name="fechaInicio"
-                                placeholder="Fecha de Inicio"
-                                value={edu.fechaInicio}
-                                onChange={(e) => handleChange(e, 'educacion', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <input
-                                type="date"
-                                name="fechaFin"
-                                placeholder="Fecha de Fin"
-                                value={edu.fechaFin}
-                                onChange={(e) => handleChange(e, 'educacion', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteEducation('educacion', index)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-                            >
-                                <i className="fas fa-trash-alt mr-2"></i>
-                                Eliminar Educación
-                            </button>
-                        </div>
-                    ))}
+                <section className="bg-yellow-50 p-6 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-semibold mb-4 text-yellow-600">Educación</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {formData.educacion.map((edu, index) => (
+                            <div key={index} className="border border-gray-300 p-4 rounded-md bg-white shadow-sm">
+                                <input
+                                    type="text"
+                                    name="gradoObtenido"
+                                    placeholder="Título"
+                                    value={edu.gradoObtenido}
+                                    onChange={(e) => handleChange(e, "educacion", index)}
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-yellow-500"
+                                />
+                                <input
+                                    type="text"
+                                    name="institucion"
+                                    placeholder="Institución"
+                                    value={edu.institucion}
+                                    onChange={(e) => handleChange(e, "educacion", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-yellow-500"
+                                />
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <input
+                                        type="date"
+                                        name="fechaInicio"
+                                        placeholder="Fecha de Inicio"
+                                        value={edu.fechaInicio}
+                                        onChange={(e) => handleChange(e, "educacion", index)}
+                                        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:border-yellow-500"
+                                    />
+                                    <input
+                                        type="date"
+                                        name="fechaFin"
+                                        placeholder="Fecha de Fin"
+                                        value={edu.fechaFin}
+                                        onChange={(e) => handleChange(e, "educacion", index)}
+                                        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:border-yellow-500"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteEducation("educacion", index)}
+                                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors w-full flex items-center justify-center"
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
+                                    Eliminar Educación
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                     <button
                         type="button"
-                        onClick={() => handleAddItem('educacion')}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors"
+                        onClick={() => handleAddItem("educacion")}
+                        className="mt-6 bg-yellow-500 text-white px-6 py-3 rounded-md hover:bg-yellow-600 transition-colors w-full flex items-center justify-center"
                     >
-                        <i className="fas fa-plus mr-2"></i>
+                        <FontAwesomeIcon icon={faPlus} className="mr-2" />
                         Agregar Educación
                     </button>
-                </div>
+                </section>
 
                 {/* Idiomas */}
-                <div className="bg-purple-50 p-6 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-semibold mb-4 text-purple-500">Idiomas</h2>
-                    {formData.idiomas.map((idi, index) => (
-                        <div key={index} className="mb-4 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
-                            <input
-                                type="text"
-                                name="nombre"
-                                placeholder="Idioma"
-                                value={idi.nombre}
-                                onChange={(e) => handleChange(e, 'idiomas', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <select
-                                name="nivelDominio"
-                                value={idi.nivelDominio}
-                                onChange={(e) => handleChange(e, 'idiomas', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            >
-                                <option value="" disabled>Selecciona el nivel de dominio</option>
-                                <option value="básico">Básico</option>
-                                <option value="intermedio">Intermedio</option>
-                                <option value="avanzado">Avanzado</option>
-                                <option value="experto">Experto</option>
-                            </select>
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteIdioma('idiomas', index)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-                            >
-                                <i className="fas fa-trash-alt mr-2"></i>
-                                Eliminar Idioma
-                            </button>
-                        </div>
-                    ))}
+                <section className="bg-purple-50 p-6 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-semibold mb-4 text-purple-600">Idiomas</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {formData.idiomas.map((idi, index) => (
+                            <div key={index} className="border border-gray-300 p-4 rounded-md bg-white shadow-sm">
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    placeholder="Idioma"
+                                    value={idi.nombre}
+                                    onChange={(e) => handleChange(e, "idiomas", index)}
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-purple-500"
+                                />
+                                <select
+                                    name="nivelDominio"
+                                    value={idi.nivelDominio}
+                                    onChange={(e) => handleChange(e, "idiomas", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-purple-500"
+                                >
+                                    <option value="" disabled>Selecciona el nivel de dominio</option>
+                                    <option value="básico">Básico</option>
+                                    <option value="intermedio">Intermedio</option>
+                                    <option value="avanzado">Avanzado</option>
+                                    <option value="experto">Experto</option>
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteIdioma("idiomas", index)}
+                                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors w-full flex items-center justify-center"
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
+                                    Eliminar Idioma
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                     <button
                         type="button"
-                        onClick={() => handleAddItem('idiomas')}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors"
+                        onClick={() => handleAddItem("idiomas")}
+                        className="mt-6 bg-purple-500 text-white px-6 py-3 rounded-md hover:bg-purple-600 transition-colors w-full flex items-center justify-center"
                     >
-                        <i className="fas fa-plus mr-2"></i>
+                        <FontAwesomeIcon icon={faPlus} className="mr-2" />
                         Agregar Idioma
                     </button>
-                </div>
+                </section>
 
                 {/* Skills */}
-                <div className="bg-teal-50 p-6 rounded-lg shadow-md">
-                    <h2 className="text-2xl font-semibold mb-4 text-teal-500">Skills</h2>
-                    {formData.skills.map((skill, index) => (
-                        <div key={index} className="mb-4 border border-gray-300 p-4 rounded-md bg-white shadow-sm">
-                            <input
-                                type="text"
-                                name="nombre"
-                                placeholder="Habilidad"
-                                value={skill.nombre}
-                                onChange={(e) => handleChange(e, 'skills', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <select
-                                name="nivelDominio"
-                                value={skill.nivelDominio}
-                                onChange={(e) => handleChange(e, 'skills', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            >
-                                <option value="" disabled>Selecciona el nivel de dominio</option>
-                                <option value="básico">Básico</option>
-                                <option value="intermedio">Intermedio</option>
-                                <option value="avanzado">Avanzado</option>
-                                <option value="experto">Experto</option>
-                            </select>
-                            <textarea
-                                name="descripcion"
-                                placeholder="Descripción"
-                                value={skill.descripcion}
-                                onChange={(e) => handleChange(e, 'skills', index)}
-                                className="block w-full p-3 border border-gray-300 rounded-md mb-4"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleDeleteSkill('skills', index)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-                            >
-                                <i className="fas fa-trash-alt mr-2"></i>
-                                Eliminar Skill
-                            </button>
-                        </div>
-                    ))}
+                <section className="bg-teal-50 p-6 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-semibold mb-4 text-teal-600">Habilidades</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {formData.skills.map((skill, index) => (
+                            <div key={index} className="border border-gray-300 p-4 rounded-md bg-white shadow-sm">
+                                <input
+                                    type="text"
+                                    name="nombre"
+                                    placeholder="Habilidad"
+                                    value={skill.nombre}
+                                    onChange={(e) => handleChange(e, "skills", index)}
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-teal-500"
+                                />
+                                <select
+                                    name="nivelDominio"
+                                    value={skill.nivelDominio}
+                                    onChange={(e) => handleChange(e, "skills", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-teal-500"
+                                >
+                                    <option value="" disabled>Selecciona el nivel de dominio</option>
+                                    <option value="básico">Básico</option>
+                                    <option value="intermedio">Intermedio</option>
+                                    <option value="avanzado">Avanzado</option>
+                                    <option value="experto">Experto</option>
+                                </select>
+                                <textarea
+                                    name="descripcion"
+                                    placeholder="Descripción"
+                                    value={skill.descripcion}
+                                    onChange={(e) => handleChange(e, "skills", index)}
+                                    className="w-full mt-4 p-3 border border-gray-300 rounded-md focus:outline-none focus:border-teal-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteSkill("skills", index)}
+                                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors w-full flex items-center justify-center"
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} className="mr-2" />
+                                    Eliminar Habilidad
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                     <button
                         type="button"
-                        onClick={() => handleAddItem('skills')}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-colors"
+                        onClick={() => handleAddItem("skills")}
+                        className="mt-6 bg-teal-500 text-white px-6 py-3 rounded-md hover:bg-teal-600 transition-colors w-full flex items-center justify-center"
                     >
-                        <i className="fas fa-plus mr-2"></i>
-                        Agregar Skill
+                        <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                        Agregar Habilidad
                     </button>
-                </div>
+                </section>
 
-                {/* Submit Button */}
+                {/* Botón para guardar cambios */}
                 <div className="flex justify-end mt-6">
                     <button
                         type="submit"
-                        className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors"
+                        className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition-colors w-full flex items-center justify-center"
                     >
-                        <i className="fas fa-save mr-2"></i>
+                        <FontAwesomeIcon icon={faSave} className="mr-2" />
                         Guardar Cambios
                     </button>
                 </div>
