@@ -44,16 +44,16 @@ const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
     defaultValue: 'Activo',
   },
   tags: {
-    type: DataTypes.TEXT, // Storing as TEXT in DB, will be handled as comma-separated values
+    type: DataTypes.TEXT, // Almacenado como TEXT en la BD, se manejará como valores separados por comas
     get() {
       const rawValue = this.getDataValue('tags');
-      return rawValue ? rawValue.split(',') : []; // On read, return as array
+      return rawValue ? rawValue.split(',') : []; // Al leer, devuelve como array
     },
     set(value) {
       if (Array.isArray(value)) {
-        this.setDataValue('tags', value.join(',')); // On save, store as string
+        this.setDataValue('tags', value.join(',')); // Al guardar, almacena como string
       } else {
-        throw new Error('Los tags deben ser un arreglo.'); // Validation error
+        throw new Error('Los tags deben ser un arreglo.'); // Error de validación
       }
     },
   },
@@ -66,6 +66,28 @@ const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'Tiempo Completo',
+  },
+
+  // Nuevos campos agregados
+  Funciones_Requerimiento: {
+    type: DataTypes.STRING,
+    allowNull: true, // Puedes ajustar esto según tus necesidades
+  },
+  Estudios_Requerimiento: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  Experiencia_Requerimiento: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  Conocimientos_Requerimiento: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  Competencias__Requerimiento: { // Nota: Verifica si el doble guion bajo es intencional
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 }, {
   tableName: 'ofertas_empleos',

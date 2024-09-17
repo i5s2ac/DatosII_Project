@@ -25,6 +25,13 @@ export default function CreateOfferPage({ params }) {
         tags: ['', '', ''], // Se permitirá agregar hasta 3 tags
         modalidad: 'Presencial', // Modalidad por defecto
         tipoTrabajo: 'Tiempo Completo', // Tipo de trabajo por defecto
+
+        // Nuevos campos requeridos
+        Funciones_Requerimiento: '',
+        Estudios_Requerimiento: '',
+        Experiencia_Requerimiento: '',
+        Conocimientos_Requerimiento: '',
+        Competencias__Requerimiento: '',
     });
 
     // La fecha de publicación se asigna automáticamente a la fecha actual
@@ -45,6 +52,15 @@ export default function CreateOfferPage({ params }) {
         setOfferData({
             ...offerData,
             tags: newTags,
+        });
+    };
+
+    // Manejo de cambios de los nuevos campos requeridos
+    const handleNewFieldChange = (e) => {
+        const { name, value } = e.target;
+        setOfferData({
+            ...offerData,
+            [name]: value,
         });
     };
 
@@ -101,19 +117,19 @@ export default function CreateOfferPage({ params }) {
                     router.back();
                 }, 1500); // Redirige después de 1.5 segundos
             } else {
-                throw new Error('Error al crear la oferta.');
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Error al crear la oferta.');
             }
         } catch (error) {
             // Mostrar SweetAlert2 para el error
             MySwal.fire({
                 title: 'Error',
-                text: 'Hubo un error al crear la oferta. Por favor, intenta de nuevo.',
+                text: error.message || 'Hubo un error al crear la oferta. Por favor, intenta de nuevo.',
                 icon: 'error',
                 confirmButtonText: 'Entendido'
             });
         }
     };
-
 
     return (
         <Layout userId={userId} empresaId={empresaId} rolId={rolId}>
@@ -175,7 +191,6 @@ export default function CreateOfferPage({ params }) {
                         />
                     </div>
 
-
                     <div>
                         <label htmlFor="salario" className="block text-lg font-medium text-gray-700">Salario</label>
                         <input
@@ -210,6 +225,80 @@ export default function CreateOfferPage({ params }) {
                         </div>
                     </div>
 
+                    {/* Nuevos Campos Requeridos */}
+                    <div className="space-y-6">
+                        <div>
+                            <label htmlFor="Funciones_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Funciones Requerimiento
+                            </label>
+                            <textarea
+                                id="Funciones_Requerimiento"
+                                name="Funciones_Requerimiento"
+                                className="mt-4 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Funciones_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Describe las funciones requeridas para el puesto..."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Estudios_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Estudios Requerimiento
+                            </label>
+                            <input
+                                type="text"
+                                id="Estudios_Requerimiento"
+                                name="Estudios_Requerimiento"
+                                className="mt-4 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Estudios_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Ej. Ingeniería en Sistemas o afín."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Experiencia_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Experiencia Requerimiento
+                            </label>
+                            <input
+                                type="text"
+                                id="Experiencia_Requerimiento"
+                                name="Experiencia_Requerimiento"
+                                className="mt-4 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Experiencia_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Ej. 3 años en desarrollo backend."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Conocimientos_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Conocimientos Requerimiento
+                            </label>
+                            <textarea
+                                id="Conocimientos_Requerimiento"
+                                name="Conocimientos_Requerimiento"
+                                className="mt-4 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Conocimientos_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Enumera los conocimientos específicos necesarios..."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Competencias__Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Competencias Requerimiento
+                            </label>
+                            <textarea
+                                id="Competencias__Requerimiento"
+                                name="Competencias__Requerimiento"
+                                className="mt-4 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Competencias__Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Describe las competencias necesarias..."
+                            />
+                        </div>
+                    </div>
 
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-6">
 
@@ -265,14 +354,14 @@ export default function CreateOfferPage({ params }) {
 
                     </div>
 
-                        <button
-                            type="submit"
-                            className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                        >
-                            Crear Oferta
-                        </button>
+                    <button
+                        type="submit"
+                        className="w-full flex justify-center py-4 px-6 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    >
+                        Crear Oferta
+                    </button>
                 </form>
             </div>
         </Layout>
-);
+    );
 }

@@ -25,6 +25,13 @@ export default function EditOfferPage({ params }) {
         tags: ['', '', ''], // Hasta 3 tags inicializados como un array vacío
         modalidad: 'Presencial', // Modalidad por defecto
         tipoTrabajo: 'Tiempo Completo', // Tipo de trabajo por defecto
+
+        // Nuevos campos requeridos
+        Funciones_Requerimiento: '',
+        Estudios_Requerimiento: '',
+        Experiencia_Requerimiento: '',
+        Conocimientos_Requerimiento: '',
+        Competencias__Requerimiento: '',
     });
 
     // Obtener los datos existentes de la oferta al montar el componente
@@ -46,7 +53,14 @@ export default function EditOfferPage({ params }) {
                         ...offerData,
                         ...data.oferta,
                         fechaCierre: data.oferta.fechaCierre ? data.oferta.fechaCierre.split('T')[0] : '',
-                        tags: tags.length === 3 ? tags : [...tags, ...Array(3 - tags.length).fill('')]
+                        tags: tags.length === 3 ? tags : [...tags, ...Array(3 - tags.length).fill('')],
+
+                        // Asignar los nuevos campos, asegurando que existan
+                        Funciones_Requerimiento: data.oferta.Funciones_Requerimiento || '',
+                        Estudios_Requerimiento: data.oferta.Estudios_Requerimiento || '',
+                        Experiencia_Requerimiento: data.oferta.Experiencia_Requerimiento || '',
+                        Conocimientos_Requerimiento: data.oferta.Conocimientos_Requerimiento || '',
+                        Competencias__Requerimiento: data.oferta.Competencias__Requerimiento || '',
                     });
                 } else {
                     throw new Error('Error al cargar los datos de la oferta');
@@ -82,6 +96,15 @@ export default function EditOfferPage({ params }) {
         });
     };
 
+    // Manejo de cambios de los nuevos campos requeridos
+    const handleNewFieldChange = (e) => {
+        const { name, value } = e.target;
+        setOfferData({
+            ...offerData,
+            [name]: value,
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -109,6 +132,18 @@ export default function EditOfferPage({ params }) {
                 confirmButtonText: 'Entendido'
             });
         }
+
+        // Validaciones adicionales para los nuevos campos (opcional)
+        // Ejemplo: verificar que los campos no excedan cierta longitud
+        if (offerData.Funciones_Requerimiento.length > 500) {
+            return MySwal.fire({
+                title: 'Error',
+                text: 'Funciones Requerimiento no puede exceder los 500 caracteres.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        }
+        // Repite para otros campos según tus necesidades
 
         try {
             const res = await fetch(`/api/ofertas/${offerId}/update`, {
@@ -161,6 +196,7 @@ export default function EditOfferPage({ params }) {
                     </h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Campos existentes */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label htmlFor="titulo" className="block text-lg font-medium text-gray-700">
@@ -171,7 +207,7 @@ export default function EditOfferPage({ params }) {
                                 id="titulo"
                                 name="titulo"
                                 maxLength="100"
-                                className="block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                                 value={offerData.titulo}
                                 onChange={handleChange}
                                 placeholder="Ej. Desarrollador Full Stack"
@@ -188,7 +224,7 @@ export default function EditOfferPage({ params }) {
                                 id="ubicacion"
                                 name="ubicacion"
                                 maxLength="100"
-                                className="block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                                 value={offerData.ubicacion}
                                 onChange={handleChange}
                                 placeholder="Ej. Ciudad de Guatemala"
@@ -231,6 +267,7 @@ export default function EditOfferPage({ params }) {
                         />
                     </div>
 
+                    {/* Tags */}
                     <div>
                         <label className="block text-lg font-medium text-gray-700">Tags (Máximo 3)</label>
                         <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -246,6 +283,86 @@ export default function EditOfferPage({ params }) {
                                     placeholder={`Tag ${index + 1}`}
                                 />
                             ))}
+                        </div>
+                    </div>
+
+                    {/* Nuevos Campos Requeridos */}
+                    <div className="space-y-6">
+                        <div>
+                            <label htmlFor="Funciones_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Funciones Requerimiento
+                            </label>
+                            <textarea
+                                id="Funciones_Requerimiento"
+                                name="Funciones_Requerimiento"
+                                maxLength="500" // Puedes ajustar la longitud según tus necesidades
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Funciones_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Describe las funciones requeridas para el puesto..."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Estudios_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Estudios Requerimiento
+                            </label>
+                            <input
+                                type="text"
+                                id="Estudios_Requerimiento"
+                                name="Estudios_Requerimiento"
+                                maxLength="100" // Puedes ajustar la longitud según tus necesidades
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Estudios_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Ej. Ingeniería en Sistemas o afín."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Experiencia_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Experiencia Requerimiento
+                            </label>
+                            <input
+                                type="text"
+                                id="Experiencia_Requerimiento"
+                                name="Experiencia_Requerimiento"
+                                maxLength="100" // Puedes ajustar la longitud según tus necesidades
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Experiencia_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Ej. 3 años en desarrollo backend."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Conocimientos_Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Conocimientos Requerimiento
+                            </label>
+                            <textarea
+                                id="Conocimientos_Requerimiento"
+                                name="Conocimientos_Requerimiento"
+                                maxLength="500" // Puedes ajustar la longitud según tus necesidades
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Conocimientos_Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Enumera los conocimientos específicos necesarios..."
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="Competencias__Requerimiento" className="block text-lg font-medium text-gray-700">
+                                Competencias Requerimiento
+                            </label>
+                            <textarea
+                                id="Competencias__Requerimiento"
+                                name="Competencias__Requerimiento"
+                                maxLength="500" // Puedes ajustar la longitud según tus necesidades
+                                className="mt-2 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                value={offerData.Competencias__Requerimiento}
+                                onChange={handleNewFieldChange}
+                                placeholder="Describe las competencias necesarias..."
+                            />
                         </div>
                     </div>
 

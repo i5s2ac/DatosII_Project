@@ -491,7 +491,7 @@ export default function UserPage({ params }) {
                         </div>
 
                     </div>
-                    <div className="mb-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
 
                         <div className="mb-6 relative">
                             {/* Input de búsqueda con icono */}
@@ -736,7 +736,7 @@ export default function UserPage({ params }) {
                                         </button>
                                     </div>
 
-                                    <div className="overflow-y-auto" style={{maxHeight: '550px'}}>
+                                    <div className="overflow-y-auto" style={{maxHeight: '580px'}}>
 
                                         {/* Tabla de Candidatos Pendientes */}
                                         {activeTab === "pending" && (
