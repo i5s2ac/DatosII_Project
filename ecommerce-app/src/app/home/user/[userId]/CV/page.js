@@ -37,17 +37,26 @@ export default function EditCV({ params }) {
                 const cvData = await cvRes.json();
 
                 if (cvData?.data) {
-                    setFormData({
-                        skills: cvData.data.habilidades || [],
-                        idiomas: cvData.data.idiomas || [],
-                        experiencia: cvData.data.experiencias || [],
-                        educacion: cvData.data.educaciones || [],
-                        certificaciones: cvData.data.certificaciones || []
-                    });
-                    setHasData(true);
+                    const hasNonEmptyData = [
+                        cvData.data.habilidades,
+                        cvData.data.idiomas,
+                        cvData.data.experiencias,
+                        cvData.data.educaciones,
+                        cvData.data.certificaciones
+                    ].some(field => field && field.length > 0);
+
+                    setHasData(hasNonEmptyData);
+                    if (hasNonEmptyData) {
+                        setFormData({
+                            skills: cvData.data.habilidades || [],
+                            idiomas: cvData.data.idiomas || [],
+                            experiencia: cvData.data.experiencias || [],
+                            educacion: cvData.data.educaciones || [],
+                            certificaciones: cvData.data.certificaciones || []
+                        });
+                    }
                 } else {
-                    // No hay datos guardados, formData permanece vacío
-                    setHasData(false);
+                    setHasData(false); // No hay datos guardados
                 }
             } catch (error) {
                 console.error('Error fetching CV data:', error);
