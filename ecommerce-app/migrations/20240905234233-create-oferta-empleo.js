@@ -70,6 +70,29 @@ module.exports = {
         allowNull: false,
         defaultValue: 'Tiempo Completo'
       },
+
+      // Nuevos campos agregados
+      Funciones_Requerimiento: {
+        type: Sequelize.STRING,
+        allowNull: true, // Ajusta según tus necesidades
+      },
+      Estudios_Requerimiento: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      Experiencia_Requerimiento: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      Conocimientos_Requerimiento: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      Competencias__Requerimiento: { // Verifica si el doble guion bajo es intencional
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
