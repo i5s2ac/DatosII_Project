@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../src/lib/sequelize');
 const Empresa = require('./Empresa');
-const User = require('./User');
+const User = require('./user');
 
 const OfertaEmpleo = sequelize.define('OfertaEmpleo', {
   titulo: {

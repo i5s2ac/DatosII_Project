@@ -8,32 +8,33 @@ module.exports = {
     const empresaUsuario = [];
     const numRegistros = 10000; // Número de registros a crear
 
-    // Obtener IDs de empresas, usuarios y roles existentes
-    const empresas = await queryInterface.rawSelect('empresas', {
-      attributes: ['id'],
-      where: {},
-    }, ['id']);
+    // Obtener IDs de empresas, usuarios y roles existentes usando queryInterface.sequelize.query
+    const empresas = await queryInterface.sequelize.query(
+        'SELECT id FROM empresas',
+        { type: Sequelize.QueryTypes.SELECT }
+    );
 
-    const usuarios = await queryInterface.rawSelect('users', {
-      attributes: ['id'],
-      where: {},
-    }, ['id']);
+    const usuarios = await queryInterface.sequelize.query(
+        'SELECT id FROM users',
+        { type: Sequelize.QueryTypes.SELECT }
+    );
 
-    const roles = await queryInterface.rawSelect('roles', {
-      attributes: ['id'],
-      where: {},
-    }, ['id']);
+    const roles = await queryInterface.sequelize.query(
+        'SELECT id FROM roles',
+        { type: Sequelize.QueryTypes.SELECT }
+    );
 
-    if (empresas.length === 0 || usuarios.length === 0 || roles.length === 0) {
-      throw new Error('No empresas, usuarios, or roles found to associate records with.');
+    // Verifica si obtuviste los datos correctos
+    if (!empresas.length || !usuarios.length || !roles.length) {
+      throw new Error('No se encontraron empresas, usuarios o roles para asociar con los registros.');
     }
 
     // Generar datos falsos para la tabla empresa_usuario
     for (let i = 0; i < numRegistros; i++) {
       empresaUsuario.push({
-        empresaId: faker.random.arrayElement(empresas),
-        usuarioId: faker.random.arrayElement(usuarios),
-        rolId: faker.random.arrayElement(roles),
+        empresaId: faker.random.arrayElement(empresas).id, // Accede al campo 'id'
+        usuarioId: faker.random.arrayElement(usuarios).id, // Accede al campo 'id'
+        rolId: faker.random.arrayElement(roles).id,        // Accede al campo 'id'
         createdAt: new Date(),
         updatedAt: new Date()
       });

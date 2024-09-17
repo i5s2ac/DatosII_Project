@@ -39,11 +39,11 @@ module.exports = {
       path: 'C:/Users/Paco/Desktop/Faker/empresas.csv', // Cambia el path según tu ubicación deseada
       header: [
         { id: 'nombre', title: 'Nombre' },
-        { id: 'direccion', title: 'Dirección' },
-        { id: 'telefono', title: 'Teléfono' },
+        { id: 'direccion', title: 'Direccion' },
+        { id: 'telefono', title: 'Telefono' },
         { id: 'email', title: 'Email' },
         { id: 'sitioWeb', title: 'Sitio Web' },
-        { id: 'descripcion', title: 'Descripción' },
+        { id: 'descripcion', title: 'Descripcion' },
         { id: 'industriaId', title: 'Industria ID' }
       ]
     });

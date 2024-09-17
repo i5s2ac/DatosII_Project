@@ -17,6 +17,7 @@ module.exports = {
           emailSet.add(email);
 
           users.push({
+            id: users.length + 1,  // Añadir un id incremental
             username: faker.internet.userName(),
             email: email,
             password: faker.internet.password(),
@@ -38,6 +39,7 @@ module.exports = {
       const csvWriter = createCsvWriter({
         path: 'C:/Users/Paco/Desktop/Faker/users.csv', // Cambia el path según tu ubicación deseada
         header: [
+          { id: 'id', title: 'ID' },            // Añadir la columna ID
           { id: 'username', title: 'Username' },
           { id: 'email', title: 'Email' },
           { id: 'password', title: 'Password' },
