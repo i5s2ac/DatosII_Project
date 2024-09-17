@@ -6,7 +6,7 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const historialAplicaciones = [];
-    const numAplicaciones = 10000; // Número de aplicaciones a crear
+    const numAplicaciones = 50; // Número de aplicaciones a crear
 
     // Obtener IDs de usuarios y ofertas de empleo existentes
     const usuarios = await queryInterface.rawSelect('users', {
@@ -42,7 +42,7 @@ module.exports = {
 
     // Crear un archivo CSV con los datos generados
     const csvWriter = createCsvWriter({
-      path: 'C:/Users/Paco/Desktop/Faker/historial_aplicaciones.csv', // Cambia el path según tu ubicación deseada
+      path: 'C:/Users/Paco/Desktop/Test/historial_aplicaciones.csv', // Cambia el path según tu ubicación deseada
       header: [
         { id: 'fechaAplicacion', title: 'Fecha Aplicacion' },
         { id: 'estadoAplicacion', title: 'Estado Aplicacion' },

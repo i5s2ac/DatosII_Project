@@ -6,7 +6,7 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const perfilesUsuarios = [];
-    const numPerfiles = 10000; // Número de perfiles a crear
+    const numPerfiles = 50; // Número de perfiles a crear
 
     // Obtener IDs de usuarios para asignar
     const [users] = await queryInterface.sequelize.query('SELECT id FROM users');
@@ -34,7 +34,7 @@ module.exports = {
 
     // Crear un archivo CSV con los datos generados
     const csvWriter = createCsvWriter({
-      path: 'C:/Users/Paco/Desktop/Faker/perfiles_usuarios.csv', // Cambia el path según tu ubicación deseada
+      path: 'C:/Users/Paco/Desktop/Test/perfil_usuarios.csv', // Cambia el path según tu ubicación deseada
       header: [
         { id: 'resumenProfesional', title: 'Resumen Profesional' },
         { id: 'ubicacion', title: 'Ubicación' },

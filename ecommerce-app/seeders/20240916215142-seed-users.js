@@ -2,6 +2,7 @@
 
 const faker = require('faker');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const bcrypt = require('bcryptjs');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -9,18 +10,21 @@ module.exports = {
       const users = [];
       const emailSet = new Set(); // Usamos un Set para asegurarnos de que los correos sean únicos
 
-      while (users.length < 10000) {
+      while (users.length < 51) {
         const email = faker.internet.email();
 
         // Asegurarse de que el email es único
         if (!emailSet.has(email)) {
           emailSet.add(email);
 
+          const plainPassword = faker.internet.password();
+          const hashedPassword = bcrypt.hashSync(plainPassword, 10); // Encriptar la contraseña
+
           users.push({
             id: users.length + 1,  // Añadir un id incremental
             username: faker.internet.userName(),
             email: email,
-            password: faker.internet.password(),
+            password: hashedPassword, // Contraseña encriptada
             telefono: faker.phone.phoneNumber(),
             createdAt: new Date(),
             updatedAt: new Date()
@@ -33,11 +37,11 @@ module.exports = {
 
       // Inserta los usuarios en la base de datos
       await queryInterface.bulkInsert('users', users, {});
-      console.log('10000 users have been added to the database');
+      console.log('51 users have been added to the database');
 
       // Crear un escritor de CSV
       const csvWriter = createCsvWriter({
-        path: 'C:/Users/Paco/Desktop/Faker/users.csv', // Cambia el path según tu ubicación deseada
+        path: 'C:/Users/Paco/Desktop/Test/users.csv', // Cambia el path según tu ubicación deseada
         header: [
           { id: 'id', title: 'ID' },            // Añadir la columna ID
           { id: 'username', title: 'Username' },

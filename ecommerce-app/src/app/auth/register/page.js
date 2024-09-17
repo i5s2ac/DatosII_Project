@@ -74,7 +74,7 @@ export default function RegisterPage() {
                             <input
                                 type="password"
                                 id="password"
-                                className="mt-1 block w-full p-4 border text-black-700 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                className="mt-1 block w-full p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                                 placeholder="Enter your password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -113,6 +113,10 @@ export default function RegisterPage() {
                             <p className="text-lg text-gray-700">Already have an account? <a href="/auth/login" className="text-primary font-medium hover:text-secondary">Log in here.</a></p>
                         </div>
                     </form>
+
+                    <div className="text-center mt-8">
+                        <p className="text-lg text-gray-700">Are you registering as a company? <a href="/auth/register_enterprise" className="text-primary font-medium hover:text-secondary">Register your company here.</a></p>
+                    </div>
                 </div>
             </div>
 
@@ -120,4 +124,3 @@ export default function RegisterPage() {
         </div>
     );
 }
-

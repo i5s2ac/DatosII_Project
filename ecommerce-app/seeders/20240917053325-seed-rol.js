@@ -20,7 +20,7 @@ module.exports = {
 
     // Crear un archivo CSV con los datos generados
     const csvWriter = createCsvWriter({
-      path: 'C:/Users/Paco/Desktop/Faker/roles.csv', // Cambia el path según tu ubicación deseada
+      path: 'C:/Users/Paco/Desktop/Test/roles.csv', // Cambia el path según tu ubicación deseada
       header: [
         { id: 'nombre', title: 'Nombre' },
         { id: 'descripcion', title: 'Descripción' }

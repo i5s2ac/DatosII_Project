@@ -7,7 +7,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
       const ofertasEmpleo = [];
-      const numOfertas = 1000; // Número de ofertas a crear
+      const numOfertas = 50; // Número de ofertas a crear
 
       // Obtener IDs de empresas y usuarios para asignar
       const empresas = await queryInterface.sequelize.query(
@@ -43,7 +43,7 @@ module.exports = {
           estatus: 'Activo',
           tags: faker.random.words(3).split(' ').join(','), // Ejemplo de 3 tags separados por comas
           modalidad: faker.helpers.randomize(['Presencial', 'Remoto', 'Híbrido']),
-          tipoTrabajo: faker.helpers.randomize(['Tiempo Completo', 'Medio Tiempo']),
+          tipoTrabajo: faker.helpers.randomize(['Tiempo Completo', 'Medio Tiempo', 'Por Proyecto']),
           Funciones_Requerimiento: faker.lorem.words(5),
           Estudios_Requerimiento: faker.lorem.words(3),
           Experiencia_Requerimiento: faker.lorem.words(4),
@@ -60,7 +60,7 @@ module.exports = {
 
       // Crear un archivo CSV con los datos generados
       const csvWriter = createCsvWriter({
-        path: 'C:/Users/Paco/Desktop/Faker/ofertasEmpleo.csv', // Cambia el path según tu ubicación deseada
+        path: 'C:/Users/Paco/Desktop/Test/ofertas_empleos.csv', // Cambia el path según tu ubicación deseada
         header: [
           { id: 'titulo', title: 'Título' },
           { id: 'descripcion', title: 'Descripción' },

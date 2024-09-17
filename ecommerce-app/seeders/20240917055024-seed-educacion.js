@@ -7,7 +7,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
       const educacion = [];
-      const numRegistros = 10000; // Número de registros a crear
+      const numRegistros = 50; // Número de registros a crear
 
       // Obtener IDs de todos los usuarios
       const usuarios = await queryInterface.sequelize.query(
@@ -40,7 +40,7 @@ module.exports = {
 
       // Crear un archivo CSV con los datos generados
       const csvWriter = createCsvWriter({
-        path: 'C:/Users/Paco/Desktop/Faker/educacion.csv', // Cambia el path según tu ubicación deseada
+        path: 'C:/Users/Paco/Desktop/Test/educacion.csv', // Cambia el path según tu ubicación deseada
         header: [
           { id: 'institucion', title: 'Institución' },
           { id: 'gradoObtenido', title: 'Grado Obtenido' },
