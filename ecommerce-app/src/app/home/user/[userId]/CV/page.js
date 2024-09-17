@@ -100,7 +100,7 @@ export default function EditCV({ params }) {
     };
 
 
-    const handleDeleteItem = async (section, index) => {
+    const handleDeleteCert = async (section, index) => {
         const itemToDelete = formData[section][index];
 
         // Confirmar si el usuario realmente desea eliminar el ítem
@@ -514,7 +514,7 @@ export default function EditCV({ params }) {
                             />
                             <button
                                 type="button"
-                                onClick={() => handleDeleteItem('experiencia', index)}
+                                onClick={() => handleDeleteExperience('experiencia', index)}
                                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
                             >
                                 <i className="fas fa-trash-alt mr-2"></i>
@@ -570,7 +570,7 @@ export default function EditCV({ params }) {
                             />
                             <button
                                 type="button"
-                                onClick={() => handleDeleteItem('certificaciones', index)}
+                                onClick={() => handleDeleteCert('certificaciones', index)}
                                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
                             >
                                 <i className="fas fa-trash-alt mr-2"></i>
@@ -627,7 +627,7 @@ export default function EditCV({ params }) {
                             />
                             <button
                                 type="button"
-                                onClick={() => handleDeleteItem('educacion', index)}
+                                onClick={() => handleDeleteEducation('educacion', index)}
                                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
                             >
                                 <i className="fas fa-trash-alt mr-2"></i>
@@ -672,7 +672,7 @@ export default function EditCV({ params }) {
                             </select>
                             <button
                                 type="button"
-                                onClick={() => handleDeleteItem('idiomas', index)}
+                                onClick={() => handleDeleteIdioma('idiomas', index)}
                                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
                             >
                                 <i className="fas fa-trash-alt mr-2"></i>
@@ -724,7 +724,7 @@ export default function EditCV({ params }) {
                             />
                             <button
                                 type="button"
-                                onClick={() => handleDeleteItem('skills', index)}
+                                onClick={() => handleDeleteSkill('skills', index)}
                                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
                             >
                                 <i className="fas fa-trash-alt mr-2"></i>
