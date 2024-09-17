@@ -242,7 +242,7 @@ export default function EditCV({ params }) {
 
         try {
             // Realiza la solicitud DELETE a la API
-            const response = await fetch(`/api/user/${userId}/education/delete?id=${itemToDelete.id}`, {
+            const response = await fetch(`/api/user/${userId}/educacion/delete?id=${itemToDelete.id}`, {
                 method: 'DELETE',
                 headers
             });
