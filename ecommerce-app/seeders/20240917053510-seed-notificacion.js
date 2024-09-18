@@ -38,7 +38,11 @@ module.exports = {
 
     // Crear un archivo CSV con los datos generados
     const csvWriter = createCsvWriter({
+<<<<<<< Updated upstream
       path: 'C:/Users/Paco/Desktop/Test/notificaciones.csv', // Cambia el path según tu ubicación deseada
+=======
+      path: '/Users/isaacjuarez/Desktop/Faker/notificaciones.csv', // Cambia el path según tu ubicación deseada
+>>>>>>> Stashed changes
       header: [
         { id: 'mensaje', title: 'Mensaje' },
         { id: 'fechaEnvio', title: 'Fecha Envío' },

@@ -43,7 +43,11 @@ module.exports = {
           estatus: 'Activo',
           tags: faker.random.words(3).split(' ').join(','), // Ejemplo de 3 tags separados por comas
           modalidad: faker.helpers.randomize(['Presencial', 'Remoto', 'Híbrido']),
+<<<<<<< Updated upstream
           tipoTrabajo: faker.helpers.randomize(['Tiempo Completo', 'Medio Tiempo', 'Por Proyecto']),
+=======
+          tipoTrabajo: faker.helpers.randomize(['Tiempo Completo', 'Medio Tiempo',"Por Proyecto"]),
+>>>>>>> Stashed changes
           Funciones_Requerimiento: faker.lorem.words(5),
           Estudios_Requerimiento: faker.lorem.words(3),
           Experiencia_Requerimiento: faker.lorem.words(4),
@@ -60,7 +64,11 @@ module.exports = {
 
       // Crear un archivo CSV con los datos generados
       const csvWriter = createCsvWriter({
+<<<<<<< Updated upstream
         path: 'C:/Users/Paco/Desktop/Test/ofertas_empleos.csv', // Cambia el path según tu ubicación deseada
+=======
+        path: '/Users/isaacjuarez/Desktop/Faker/ofertasEmpleo.csv', // Cambia el path según tu ubicación deseada
+>>>>>>> Stashed changes
         header: [
           { id: 'titulo', title: 'Título' },
           { id: 'descripcion', title: 'Descripción' },

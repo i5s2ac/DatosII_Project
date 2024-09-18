@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Image from 'next/image';
 import Layout from '../../../components/Layout'; // Ajusta la ruta según tu estructura de carpetas
 import {
@@ -266,7 +269,7 @@ export default function UserPage({ params }) {
 
         return (
             <>
-                <div className="mt-6 h-[330px] overflow-y-auto pr-4">
+                <div className="mt-6 max-h-[330px] overflow-y-auto pr-4">
                     <h3 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
                         Descripción del trabajo
                     </h3>
@@ -426,6 +429,44 @@ export default function UserPage({ params }) {
             )}
         </>
     );
+
+    const settings = {
+        dots: true,
+        infinite: false,
+        speed: 500,
+        vertical: true,
+        slidesToShow: 2,
+        slidesToScroll: 2,
+        appendDots: (dots) => (
+            <div style={{ marginTop: "40px" }}>
+                <ul style={{ margin: "0px" }}> {dots} </ul>
+            </div>
+        ),
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                },
+            },
+        ],
+    };
+
 
     return (
         <Layout userId={userId}>
@@ -615,156 +656,171 @@ export default function UserPage({ params }) {
                             Resultados de búsqueda
                         </h2>
 
-                        <p className="text-gray-500 mb-4">{filteredJobs.length} trabajos encontrados</p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white rounded-lg min-h-[590px] overflow-y-auto">
-                                <div className="space-y-4">
-                                    {filteredJobs.length > 0 ? (
-                                        filteredJobs.map((job) => (
-                                            <div
-                                                key={job.id}
-                                                onClick={() => handleJobClick(job)}
-                                                className={`cursor-pointer bg-white rounded-lg shadow-md p-4 hover:shadow-lg border ${
-                                                    selectedJob && selectedJob.id === job.id
-                                                        ? 'border-blue-500'
-                                                        : 'border-gray-200'
-                                                } transition duration-200`}
-                                            >
+                        <div className="flex flex-wrap justify-between ">
 
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="flex items-center">
-                                                        <div
-                                                            className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
-                                                            <span
-                                                                className="text-lg font-bold text-white">{job.titulo.charAt(0)}</span>
+
+                            <p className="text-gray-500 mb-4">{filteredJobs.length} trabajos encontrados</p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-white rounded-lg min-h-[500px] overflow-y-auto">
+                                    <div className="space-y-6">
+                                        {filteredJobs.length > 0 ? (
+                                            <Slider {...settings}>
+                                                {filteredJobs.map((job) => (
+                                                    <div
+                                                        key={job.id}
+                                                        onClick={() => handleJobClick(job)}
+                                                        className={`cursor-pointer bg-white rounded-lg shadow-md p-6 hover:shadow-lg border transition duration-200 ${
+                                                            selectedJob && selectedJob.id === job.id ? 'border-blue-500' : 'border-gray-200'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center">
+                                                                <div
+                                                                    className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
+                  <span className="text-lg font-bold text-white">
+                    {job.titulo.charAt(0)}
+                  </span>
+                                                                </div>
+                                                                <div className="ml-4">
+                                                                    <p className="text-lg font-semibold text-gray-900 truncate">
+                                                                        {job.titulo.length > 20
+                                                                            ? `${job.titulo.substring(0, 20)}...`
+                                                                            : job.titulo}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="ml-4">
-                                                            <p className="text-lg font-semibold text-gray-900 truncate">
-                                                                {job.titulo.length > 20 ? `${job.titulo.substring(0, 20)}...` : job.titulo}
-                                                            </p>
+
+                                                        <p className="text-gray-900 font-bold">
+                                                            Compañía: {job.empresa?.nombre || 'Empresa no especificada'}
+                                                        </p>
+                                                        <p className="text-gray-500 mt-4 text-md">{job.descripcion}</p>
+
+                                                        <p className="mt-4 text-gray-800 font-bold text-md">
+                                                            Ubicación: {job.ubicacion}
+                                                        </p>
+
+                                                        <div className="mt-4 flex flex-wrap items-center gap-4 text-md">
+              <span className="text-gray-900 font-semibold">
+                Oferta Salarial: {job.salario ? `Q${job.salario}` : 'Salario no especificado'}
+              </span>
+                                                        </div>
+
+                                                        <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
+              <span className="px-3 py-1 bg-green-200 text-green-700 rounded-full font-medium">
+                {job.tipoTrabajo || 'Tipo no especificado'}
+              </span>
+                                                            <span
+                                                                className="px-3 py-1 bg-blue-200 text-blue-700 rounded-full font-medium">
+                {job.modalidad || 'Modalidad no especificada'}
+              </span>
+
+                                                            {job.tags?.map((tag, index) => (
+                                                                <span
+                                                                    key={index}
+                                                                    className="px-3 py-1 bg-yellow-200 text-yellow-700 rounded-full font-medium"
+                                                                >
+                  {tag}
+                </span>
+                                                            ))}
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <p className="text-gray-900 mt-2 font-bold">Compañía: {job.empresa?.nombre || 'Empresa no especificada'}</p>
-                                                <p className="text-gray-500 mt-4 text-md">{job.descripcion}</p>
-
-                                                <p className="mt-4 text-gray-800 font-bold text-md">Ubicación: {job.ubicacion}</p>
-
-                                                <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
-                                                    <span className="text-gray-900 font-semibold">
-                                                        Oferta Salarial: {job.salario ? `Q${job.salario}` : 'Salario no especificado'}
-                                                    </span>
-                                                </div>
-                                                <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
-                                                    <span
-                                                        className="px-3 py-1 bg-green-200 text-green-700 rounded-full font-medium">
-                                                        {job.tipoTrabajo || 'Tipo no especificado'}
-                                                    </span>
-                                                    <span
-                                                        className="px-3 py-1 bg-blue-200 text-blue-700 rounded-full font-medium">
-                                                        {job.modalidad || 'Modalidad no especificada'}
-                                                    </span>
-
-                                                    {job.tags?.map((tag, index) => (
-                                                        <span key={index}
-                                                              className="px-3 py-1 bg-yellow-200 text-yellow-700 rounded-full font-medium">
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
-
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p>No se encontraron ofertas de trabajo</p>
-                                    )}
+                                                ))}
+                                            </Slider>
+                                        ) : (
+                                            <p className="text-gray-500">No se encontraron ofertas de trabajo</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {selectedJob ? (
-                                <div
-                                    className="col-span-1 md:col-span-2 bg-white rounded-lg shadow-lg border border-gray-200 p-6">
-                                    <div className="flex items-center mb-4">
 
-                                        <div>
-                                            <div
-                                                className="mt-4 bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
+                                {selectedJob ? (
+                                    <div
+                                        className="col-span-1 md:col-span-2 bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+                                        <div className="flex items-center mb-4">
+
+                                            <div>
+                                                <div
+                                                    className="mt-4 bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
                                                 <span
                                                     className="text-lg font-bold text-white">{selectedJob.titulo.charAt(0)}</span>
+                                                </div>
+                                            </div>
+                                            <h2 className="ml-4 mt-4 text-3xl font-bold text-gray-800">{selectedJob.titulo}</h2>
+                                        </div>
+
+                                        <div className="flex py-6 space-x-4">
+                                            <div
+                                                className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
+                                                <div className="text-sm">Salario</div>
+                                                <div className="text-2xl font-bold">Q{selectedJob.salario} <span
+                                                    className="text-base font-normal">/Mes</span>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                className="px-6 py-4 bg-blue-100 text-blue-800 text-center rounded-2xl">
+                                                <div className="text-sm">Tipo de Empleo</div>
+                                                <div
+                                                    className="text-2xl font-bold">{selectedJob.tipoTrabajo || 'Tipo no especificado'}</div>
+                                            </div>
+
+                                            <div
+                                                className="px-6 py-4 bg-orange-100 text-orange-800 text-center rounded-2xl">
+                                                <div className="text-sm">Modalidad</div>
+                                                <div
+                                                    className="text-2xl font-bold">{selectedJob.modalidad || 'Modalidad no especificada'}</div>
+                                            </div>
+
+                                            <div
+                                                className="px-6 py-4 bg-purple-100 text-purple-800 text-center rounded-2xl">
+                                                <div className="text-sm">Skill</div>
+                                                <div className="text-2xl font-bold">Expert</div>
                                             </div>
                                         </div>
-                                        <h2 className="ml-4 mt-4 text-3xl font-bold text-gray-800">{selectedJob.titulo}</h2>
+
+                                        <div className="mb-6 border-b border-gray-200">
+                                            <nav className="-mb-px flex space-x-8">
+
+                                                <button
+                                                    onClick={() => setActiveTab('oferta')}
+                                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-md ${
+                                                        activeTab === 'oferta'
+                                                            ? 'border-blue-600 text-blue-600'
+                                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    Información de la oferta
+                                                </button>
+                                                <button
+                                                    onClick={() => setActiveTab('empresa')}
+                                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-md ${
+                                                        activeTab === 'empresa'
+                                                            ? 'border-blue-600 text-blue-600'
+                                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    Información de la empresa
+                                                </button>
+                                            </nav>
+                                        </div>
+
+                                        {activeTab === 'oferta' ? renderOfferDetails() : renderCompanyDetails()}
                                     </div>
-
-                                    <div className="flex py-6 space-x-4">
-                                        <div
-                                            className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
-                                            <div className="text-sm">Salario</div>
-                                            <div className="text-2xl font-bold">Q{selectedJob.salario} <span
-                                                className="text-base font-normal">/Mes</span>
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            className="px-6 py-4 bg-blue-100 text-blue-800 text-center rounded-2xl">
-                                            <div className="text-sm">Tipo de Empleo</div>
-                                            <div
-                                                className="text-2xl font-bold">{selectedJob.tipoTrabajo || 'Tipo no especificado'}</div>
-                                        </div>
-
-                                        <div
-                                            className="px-6 py-4 bg-orange-100 text-orange-800 text-center rounded-2xl">
-                                            <div className="text-sm">Modalidad</div>
-                                            <div
-                                                className="text-2xl font-bold">{selectedJob.modalidad || 'Modalidad no especificada'}</div>
-                                        </div>
-
-                                        <div
-                                            className="px-6 py-4 bg-purple-100 text-purple-800 text-center rounded-2xl">
-                                            <div className="text-sm">Skill</div>
-                                            <div className="text-2xl font-bold">Expert</div>
-                                        </div>
+                                ) : (
+                                    <div className="col-span-1 md:col-span-2  flex items-center justify-center">
+                                        <p className="text-gray-500 text-xl">Selecciona una oferta para ver los
+                                            detalles</p>
                                     </div>
-
-                                    <div className="mb-6 border-b border-gray-200">
-                                        <nav className="-mb-px flex space-x-8">
-
-                                            <button
-                                                onClick={() => setActiveTab('oferta')}
-                                                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-md ${
-                                                    activeTab === 'oferta'
-                                                        ? 'border-blue-600 text-blue-600'
-                                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                                }`}
-                                            >
-                                                Información de la oferta
-                                            </button>
-                                            <button
-                                                onClick={() => setActiveTab('empresa')}
-                                                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-md ${
-                                                    activeTab === 'empresa'
-                                                        ? 'border-blue-600 text-blue-600'
-                                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                                }`}
-                                            >
-                                                Información de la empresa
-                                            </button>
-                                        </nav>
-                                    </div>
-
-                                    {activeTab === 'oferta' ? renderOfferDetails() : renderCompanyDetails()}
-                                </div>
-                            ) : (
-                                <div className="col-span-1 md:col-span-2  flex items-center justify-center">
-                                    <p className="text-gray-500 text-xl">Selecciona una oferta para ver los detalles</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </section>
                 </main>
             </div>
         </Layout>
-    );
+    )
+        ;
 }

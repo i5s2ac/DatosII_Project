@@ -41,7 +41,11 @@ module.exports = {
 
       // Crear un archivo CSV con los datos generados
       const csvWriter = createCsvWriter({
+<<<<<<< Updated upstream
         path: 'C:/Users/Paco/Desktop/Test/experiencia_laboral.csv', // Cambia el path según tu ubicación deseada
+=======
+        path: '/Users/isaacjuarez/Desktop/Faker/experiencia_laboral.csv', // Cambia el path según tu ubicación deseada
+>>>>>>> Stashed changes
         header: [
           { id: 'usuarioid', title: 'Usuario ID' },
           { id: 'titulo_puesto', title: 'Título Puesto' },
