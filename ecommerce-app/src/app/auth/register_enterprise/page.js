@@ -26,7 +26,7 @@ export default function RegisterCompanyPage() {
         const fetchIndustrias = async () => {
             setLoadingIndustrias(true);
             try {
-                const response = await fetch('/api/industrias');
+                const response = await fetch('/api/Auth/industrias');
                 if (!response.ok) {
                     throw new Error('Failed to fetch industries');
                 }
@@ -57,7 +57,7 @@ export default function RegisterCompanyPage() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        const res = await fetch('/api/register_enterprise', {
+        const res = await fetch('/api/Auth/register_enterprise', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

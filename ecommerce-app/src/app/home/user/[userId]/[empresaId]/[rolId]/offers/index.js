@@ -6,7 +6,7 @@ export default function OffersList() {
 
     useEffect(() => {
         const fetchOffers = async () => {
-            const res = await fetch('/api/ofertas');
+            const res = await fetch('/api/OffersCompany');
             const data = await res.json();
 
             if (data.success) {
@@ -23,7 +23,7 @@ export default function OffersList() {
         const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta oferta?');
 
         if (confirmDelete) {
-            const res = await fetch(`/api/ofertas/${id}/delete`, {
+            const res = await fetch(`/api/OffersCompany/${id}/delete`, {
                 method: 'DELETE',
             });
 

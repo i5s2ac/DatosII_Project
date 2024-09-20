@@ -46,17 +46,9 @@ export default function Navbar({ userId, empresaId, rolId }) {
                 if (data.success) {
                     setUsername(data.user.username);
 
-                    // Verificar si el usuario está en una empresa
-                    const resCompany = await fetch(`/api/user/${userId}/empresausuario`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    const companyData = await resCompany.json();
-                    setIsInCompany(companyData.isInCompany);
 
                     // Verificar si el usuario ya tiene un CV
-                    const endpoint = `/api/user/${userId}/getCV`;
+                    const endpoint = `/api/user/${userId}/Resume/getCV`;
 
                     const response = await fetch(endpoint, {
                         headers: {

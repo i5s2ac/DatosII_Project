@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import Image from 'next/image';
 import Layout from '../../../components/Layout'; // Ajusta la ruta según tu estructura de carpetas
 import {
@@ -46,63 +43,52 @@ export default function UserPage({ params }) {
     const router = useRouter();
 
     useEffect(() => {
-        const fetchUsername = async () => {
+        const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error('Token no encontrado');
                 }
-                const res = await fetch(`/api/user/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setUsername(data.user.username);
+
+                // Fetch de usuario y ofertas en paralelo
+                const [userRes, jobsRes] = await Promise.all([
+                    fetch(`/api/user/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }),
+                    fetch(`/api/user/${userId}/JobsOffers/ofertas`)
+                ]);
+
+                const userData = await userRes.json();
+                const jobsData = await jobsRes.json();
+
+                if (userData.success) {
+                    setUsername(userData.user.username);
                 } else {
                     router.push('/auth/login');
                 }
+
+                if (jobsData.success) {
+                    setJobs(jobsData.ofertas);
+                    setFilteredJobs(jobsData.ofertas);
+                } else {
+                    console.error('Error al obtener las ofertas:', jobsData.message);
+                }
             } catch (error) {
-                console.error('Error fetching username:', error);
+                console.error('Error fetching data:', error);
                 router.push('/auth/login');
             }
         };
 
-        fetchUsername();
-    }, [userId, router]);
+        fetchData();
+    }, [userId]);  // Elimina otras dependencias innecesarias
 
-    // Fetch de ofertas de empleo
-    useEffect(() => {
-        const fetchJobs = async () => {
-            try {
-                const response = await fetch(`/api/user/${userId}/ofertas`);
-                if (!response.ok) {
-                    throw new Error('Error al obtener las ofertas de empleo');
-                }
-                const data = await response.json();
-                if (data.success) {
-                    setJobs(data.ofertas);
-                    setFilteredJobs(data.ofertas); // Inicialmente, todas las ofertas se muestran
-                } else {
-                    console.error('Error al obtener las ofertas:', data.message);
-                }
-            } catch (error) {
-                console.error('Error al obtener las ofertas de empleo:', error);
-            }
-        };
-
-        fetchJobs();
-    }, [userId]);
-
-    // Al seleccionar una oferta, verificar si el usuario ya aplicó
     const handleJobClick = (job) => {
         setSelectedJob(job);
-        setActiveTab('oferta'); // Restablecer a la pestaña "Oferta" al seleccionar un nuevo trabajo
+        setActiveTab('oferta');
 
         const fetchSolicitudEstado = async () => {
             try {
-                const response = await fetch('/api/candidatura/estado', {
+                const response = await fetch('/api/Applicants/estado', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -116,7 +102,7 @@ export default function UserPage({ params }) {
                 const data = await response.json();
 
                 if (data.success) {
-                    setSolicitudEstado(data.estado); // 'pendiente', 'aceptada', 'rechazada', o null
+                    setSolicitudEstado(data.estado); // Actualizar correctamente el estado
                 } else {
                     setError(data.message || 'Hubo un problema al verificar el estado de la solicitud');
                 }
@@ -125,21 +111,24 @@ export default function UserPage({ params }) {
             }
         };
 
-        fetchSolicitudEstado(); // Ejecutar solo cuando se selecciona un trabajo
+        // Llamar a la función solo si el trabajo está seleccionado
+        if (job) {
+            fetchSolicitudEstado();
+        }
     };
 
-    // Aplicación de filtros
+
+
     useEffect(() => {
+        // Solo se ejecuta cuando cambian los filtros
         let filtered = jobs;
 
-        // Filtro por ubicación
         if (searchTermUbicacion) {
             filtered = filtered.filter((offer) =>
                 offer.ubicacion.toLowerCase().includes(searchTermUbicacion.toLowerCase())
             );
         }
 
-        // Filtro por título
         if (searchTermTitulo) {
             filtered = filtered.filter((offer) =>
                 offer.titulo.toLowerCase().includes(searchTermTitulo.toLowerCase())
@@ -179,8 +168,11 @@ export default function UserPage({ params }) {
             filtered = filtered.filter((offer) => offer.modalidad === modalityFilter);
         }
 
+
         setFilteredJobs(filtered);
     }, [searchTermUbicacion, searchTermTitulo, dateFilter, salaryFilter, typeFilter, modalityFilter, jobs]);
+
+
 
     const handleViewCVClick = () => {
         router.push(`/home/user/${userId}/CV`);
@@ -189,32 +181,32 @@ export default function UserPage({ params }) {
     const handleApply = async () => {
         if (solicitudEstado) return; // Si ya ha aplicado, no hacer nada
 
-        setLoading(true);  // Indicar que se está enviando la solicitud
-        setError(null);    // Resetear posibles errores previos
-        setSuccess(false); // Resetear el estado de éxito
+        setLoading(true);   // Indicar que se está enviando la solicitud
+        setError(null);     // Resetear posibles errores previos
+        setSuccess(false);  // Resetear el estado de éxito
 
         try {
-            const response = await fetch('/api/candidatura/apply', {
+            const response = await fetch('/api/Applicants/apply', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    usuarioId: userId,  // Usar el userId del contexto actual
-                    ofertaEmpleoId: selectedJob.id,  // ID de la oferta seleccionada
+                    usuarioId: userId,             // Usar el userId del contexto actual
+                    ofertaEmpleoId: selectedJob.id // ID de la oferta seleccionada
                 }),
             });
 
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok && data.success) {
                 setSuccess(true);  // Aplicación exitosa
                 setSolicitudEstado('pendiente'); // Cambiar el estado de la solicitud a 'pendiente'
             } else {
                 setError(data.message || 'Hubo un problema al aplicar');  // Mostrar el mensaje de error
             }
         } catch (err) {
-            console.error(err);
+            console.error('Error:', err);
             setError('Hubo un error al conectarse con el servidor');
         } finally {
             setLoading(false); // Terminar el estado de carga
@@ -222,45 +214,49 @@ export default function UserPage({ params }) {
     };
 
     const renderApplyButton = () => {
-        if (solicitudEstado === 'pendiente') {
+        if (loading) {
             return (
                 <button
-                    className="bg-yellow-500 text-white w-full py-3 rounded-lg"
+                    className="bg-blue-600 text-white w-full py-3 rounded-lg opacity-50 cursor-not-allowed"
                     disabled
                 >
-                    Solicitud Pendiente
-                </button>
-            );
-        } else if (solicitudEstado === 'aceptada') {
-            return (
-                <button
-                    className="bg-green-500 text-white w-full py-3 rounded-lg"
-                    disabled
-                >
-                    Solicitud Aceptada
-                </button>
-            );
-        } else if (solicitudEstado === 'rechazada') {
-            return (
-                <button
-                    className="bg-red-500 text-white w-full py-3 rounded-lg"
-                    disabled
-                >
-                    Solicitud Rechazada
-                </button>
-            );
-        } else {
-            return (
-                <button
-                    onClick={handleApply}
-                    className="bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={loading}
-                >
-                    {loading ? "Aplicando..." : "Aplicar"}
+                    Aplicando...
                 </button>
             );
         }
+
+        // Asegurarse de manejar todos los estados posibles
+        switch (solicitudEstado) {
+            case 'pendiente':
+                return (
+                    <button className="bg-yellow-500 text-white w-full py-4 rounded-lg" disabled>
+                        Solicitud Pendiente
+                    </button>
+                );
+            case 'aceptada':
+                return (
+                    <button className="bg-green-500 text-white w-full py-4 rounded-lg" disabled>
+                        Solicitud Aceptada
+                    </button>
+                );
+            case 'rechazada':
+                return (
+                    <button className="bg-red-500 text-white w-full py-4 rounded-lg" disabled>
+                        Solicitud Rechazada
+                    </button>
+                );
+            default:
+                return (
+                    <button
+                        onClick={handleApply}
+                        className="bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        Aplicar
+                    </button>
+                );
+        }
     };
+
 
     const renderOfferDetails = () => {
         if (!selectedJob) {
@@ -269,7 +265,7 @@ export default function UserPage({ params }) {
 
         return (
             <>
-                <div className="mt-6 max-h-[330px] overflow-y-auto pr-4">
+                <div className="mt-6 max-h-[580px] overflow-y-auto pr-4">
                     <h3 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
                         Descripción del trabajo
                     </h3>
@@ -314,7 +310,7 @@ export default function UserPage({ params }) {
                         Competencias Requeridas
                     </h3>
 
-                    <p className="mt-3 text-gray-700 leading-relaxed text-md text-justify">
+                    <p className="mt-3 mb-12 text-gray-700 leading-relaxed text-md text-justify">
                         {selectedJob.Competencias__Requerimiento || "Competencias no disponibles"}
                     </p>
                 </div>
@@ -430,42 +426,6 @@ export default function UserPage({ params }) {
         </>
     );
 
-    const settings = {
-        dots: true,
-        infinite: false,
-        speed: 500,
-        vertical: true,
-        slidesToShow: 2,
-        slidesToScroll: 2,
-        appendDots: (dots) => (
-            <div style={{ marginTop: "40px" }}>
-                <ul style={{ margin: "0px" }}> {dots} </ul>
-            </div>
-        ),
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                },
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                },
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                },
-            },
-        ],
-    };
 
 
     return (
@@ -656,126 +616,106 @@ export default function UserPage({ params }) {
                             Resultados de búsqueda
                         </h2>
 
-
-                        <div className="flex flex-wrap justify-between ">
-
-
+                        <div className="flex flex-wrap justify-between">
                             <p className="text-gray-500 mb-4">{filteredJobs.length} trabajos encontrados</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="bg-white rounded-lg min-h-[500px] overflow-y-auto">
+                                <div className="bg-white rounded-lg max-h-[780px] overflow-y-auto">
                                     <div className="space-y-6">
                                         {filteredJobs.length > 0 ? (
-                                            <Slider {...settings}>
-                                                {filteredJobs.map((job) => (
-                                                    <div
-                                                        key={job.id}
-                                                        onClick={() => handleJobClick(job)}
-                                                        className={`cursor-pointer bg-white rounded-lg shadow-md p-6 hover:shadow-lg border transition duration-200 ${
-                                                            selectedJob && selectedJob.id === job.id ? 'border-blue-500' : 'border-gray-200'
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center justify-between mb-4">
-                                                            <div className="flex items-center">
-                                                                <div
-                                                                    className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">
-                    {job.titulo.charAt(0)}
-                  </span>
-                                                                </div>
-                                                                <div className="ml-4">
-                                                                    <p className="text-lg font-semibold text-gray-900 truncate">
-                                                                        {job.titulo.length > 20
-                                                                            ? `${job.titulo.substring(0, 20)}...`
-                                                                            : job.titulo}
-                                                                    </p>
-                                                                </div>
+                                            filteredJobs.map((job) => (
+                                                <div
+                                                    key={job.id}
+                                                    onClick={() => handleJobClick(job)}
+                                                    className={`cursor-pointer bg-white rounded-lg shadow-md p-6 hover:shadow-lg border transition duration-200 ${
+                                                        selectedJob && selectedJob.id === job.id ? 'border-blue-500' : 'border-gray-200'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="flex items-center">
+                                                            <div className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
+                    <span className="text-lg font-bold text-white">
+                      {job.titulo.charAt(0)}
+                    </span>
+                                                            </div>
+                                                            <div className="ml-4">
+                                                                <p className="text-lg font-semibold text-gray-900 truncate">
+                                                                    {job.titulo.length > 20
+                                                                        ? `${job.titulo.substring(0, 20)}...`
+                                                                        : job.titulo}
+                                                                </p>
                                                             </div>
                                                         </div>
-
-                                                        <p className="text-gray-900 font-bold">
-                                                            Compañía: {job.empresa?.nombre || 'Empresa no especificada'}
-                                                        </p>
-                                                        <p className="text-gray-500 mt-4 text-md">{job.descripcion}</p>
-
-                                                        <p className="mt-4 text-gray-800 font-bold text-md">
-                                                            Ubicación: {job.ubicacion}
-                                                        </p>
-
-                                                        <div className="mt-4 flex flex-wrap items-center gap-4 text-md">
-              <span className="text-gray-900 font-semibold">
-                Oferta Salarial: {job.salario ? `Q${job.salario}` : 'Salario no especificado'}
-              </span>
-                                                        </div>
-
-                                                        <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
-              <span className="px-3 py-1 bg-green-200 text-green-700 rounded-full font-medium">
-                {job.tipoTrabajo || 'Tipo no especificado'}
-              </span>
-                                                            <span
-                                                                className="px-3 py-1 bg-blue-200 text-blue-700 rounded-full font-medium">
-                {job.modalidad || 'Modalidad no especificada'}
-              </span>
-
-                                                            {job.tags?.map((tag, index) => (
-                                                                <span
-                                                                    key={index}
-                                                                    className="px-3 py-1 bg-yellow-200 text-yellow-700 rounded-full font-medium"
-                                                                >
-                  {tag}
-                </span>
-                                                            ))}
-                                                        </div>
                                                     </div>
-                                                ))}
-                                            </Slider>
+
+                                                    <p className="text-gray-900 font-bold">
+                                                        Compañía: {job.empresa?.nombre || 'Empresa no especificada'}
+                                                    </p>
+                                                    <p className="text-gray-500 mt-4 text-md">{job.descripcion}</p>
+
+                                                    <p className="mt-4 text-gray-800 font-bold text-md">
+                                                        Ubicación: {job.ubicacion}
+                                                    </p>
+
+                                                    <div className="mt-4 flex flex-wrap items-center gap-4 text-md">
+                <span className="text-gray-900 font-semibold">
+                  Oferta Salarial: {job.salario ? `Q${job.salario}` : 'Salario no especificado'}
+                </span>
+                                                    </div>
+
+                                                    <div className="mt-4 flex flex-wrap items-center gap-3 text-md">
+                <span className="px-3 py-1 bg-green-200 text-green-700 rounded-full font-medium">
+                  {job.tipoTrabajo || 'Tipo no especificado'}
+                </span>
+                                                        <span className="px-3 py-1 bg-blue-200 text-blue-700 rounded-full font-medium">
+                  {job.modalidad || 'Modalidad no especificada'}
+                </span>
+
+                                                        {job.tags?.map((tag, index) => (
+                                                            <span
+                                                                key={index}
+                                                                className="px-3 py-1 bg-yellow-200 text-yellow-700 rounded-full font-medium"
+                                                            >
+                    {tag}
+                  </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))
                                         ) : (
                                             <p className="text-gray-500">No se encontraron ofertas de trabajo</p>
                                         )}
                                     </div>
                                 </div>
 
-
                                 {selectedJob ? (
-                                    <div
-                                        className="col-span-1 md:col-span-2 bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+                                    <div className="col-span-1 md:col-span-2 bg-white rounded-lg shadow-lg border border-gray-200 p-6">
                                         <div className="flex items-center mb-4">
-
-                                            <div>
-                                                <div
-                                                    className="mt-4 bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
-                                                <span
-                                                    className="text-lg font-bold text-white">{selectedJob.titulo.charAt(0)}</span>
-                                                </div>
+                                            <div className="mt-4 bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
+                                                <span className="text-lg font-bold text-white">{selectedJob.titulo.charAt(0)}</span>
                                             </div>
                                             <h2 className="ml-4 mt-4 text-3xl font-bold text-gray-800">{selectedJob.titulo}</h2>
                                         </div>
 
                                         <div className="flex py-6 space-x-4">
-                                            <div
-                                                className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
+                                            <div className="px-6 py-4 bg-green-100 text-green-800 text-center rounded-2xl">
                                                 <div className="text-sm">Salario</div>
-                                                <div className="text-2xl font-bold">Q{selectedJob.salario} <span
-                                                    className="text-base font-normal">/Mes</span>
+                                                <div className="text-2xl font-bold">
+                                                    Q{selectedJob.salario} <span className="text-base font-normal">/Mes</span>
                                                 </div>
                                             </div>
 
-                                            <div
-                                                className="px-6 py-4 bg-blue-100 text-blue-800 text-center rounded-2xl">
+                                            <div className="px-6 py-4 bg-blue-100 text-blue-800 text-center rounded-2xl">
                                                 <div className="text-sm">Tipo de Empleo</div>
-                                                <div
-                                                    className="text-2xl font-bold">{selectedJob.tipoTrabajo || 'Tipo no especificado'}</div>
+                                                <div className="text-2xl font-bold">{selectedJob.tipoTrabajo || 'Tipo no especificado'}</div>
                                             </div>
 
-                                            <div
-                                                className="px-6 py-4 bg-orange-100 text-orange-800 text-center rounded-2xl">
+                                            <div className="px-6 py-4 bg-orange-100 text-orange-800 text-center rounded-2xl">
                                                 <div className="text-sm">Modalidad</div>
-                                                <div
-                                                    className="text-2xl font-bold">{selectedJob.modalidad || 'Modalidad no especificada'}</div>
+                                                <div className="text-2xl font-bold">{selectedJob.modalidad || 'Modalidad no especificada'}</div>
                                             </div>
 
-                                            <div
-                                                className="px-6 py-4 bg-purple-100 text-purple-800 text-center rounded-2xl">
+                                            <div className="px-6 py-4 bg-purple-100 text-purple-800 text-center rounded-2xl">
                                                 <div className="text-sm">Skill</div>
                                                 <div className="text-2xl font-bold">Expert</div>
                                             </div>
@@ -783,7 +723,6 @@ export default function UserPage({ params }) {
 
                                         <div className="mb-6 border-b border-gray-200">
                                             <nav className="-mb-px flex space-x-8">
-
                                                 <button
                                                     onClick={() => setActiveTab('oferta')}
                                                     className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-md ${
@@ -810,17 +749,26 @@ export default function UserPage({ params }) {
                                         {activeTab === 'oferta' ? renderOfferDetails() : renderCompanyDetails()}
                                     </div>
                                 ) : (
-                                    <div className="col-span-1 md:col-span-2  flex items-center justify-center">
-                                        <p className="text-gray-500 text-xl">Selecciona una oferta para ver los
-                                            detalles</p>
+                                    <div className="col-span-1 md:col-span-2 flex items-center justify-center">
+                                        <p className="text-gray-500 text-xl">Selecciona una oferta para ver los detalles</p>
                                     </div>
                                 )}
-                            </div>
-                        </div>
-                    </section>
-                </main>
+
+
+
+
+
+
+
+
+
+
             </div>
-        </Layout>
-    )
-        ;
+        </div>
+</section>
+</main>
+</div>
+</Layout>
+)
+    ;
 }

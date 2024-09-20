@@ -112,7 +112,7 @@ export default function CreateCV({ params }) {
         };
 
         try {
-            const response = await fetch(`/api/user/${userId}/createCompleteCV`, {
+            const response = await fetch(`/api/user/${userId}/Resume/createCompleteCV`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({

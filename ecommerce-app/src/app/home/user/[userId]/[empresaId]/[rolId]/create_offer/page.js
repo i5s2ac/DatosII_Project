@@ -93,7 +93,7 @@ export default function CreateOfferPage({ params }) {
         }
 
         try {
-            const res = await fetch('/api/ofertas/create', {
+            const res = await fetch('/api/OffersCompany/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

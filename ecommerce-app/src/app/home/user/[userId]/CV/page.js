@@ -36,7 +36,7 @@ export default function EditCV({ params }) {
         // Verificar si hay datos existentes del CV
         const fetchCVData = async () => {
             try {
-                const cvRes = await fetch(`/api/user/${userId}/getCV`, { method: 'GET', headers });
+                const cvRes = await fetch(`/api/user/${userId}/Resume/getCV`, { method: 'GET', headers });
                 const cvData = await cvRes.json();
 
                 if (cvData?.data) {
@@ -414,7 +414,7 @@ export default function EditCV({ params }) {
 
             // Primero actualizar los datos existentes
             if (Object.values(existingData).some(arr => arr.length > 0)) {
-                const updateResponse = await fetch(`/api/user/${userId}/updateCV`, {
+                const updateResponse = await fetch(`/api/user/${userId}/Resume/updateCV`, {
                     method: 'PUT',
                     headers,
                     body: JSON.stringify(existingData)
@@ -428,7 +428,7 @@ export default function EditCV({ params }) {
 
             // Luego crear los nuevos datos
             if (Object.values(newData).some(arr => arr.length > 0)) {
-                const createResponse = await fetch(`/api/user/${userId}/createCompleteCV`, {
+                const createResponse = await fetch(`/api/user/${userId}/Resume/createCompleteCV`, {
                     method: 'POST',
                     headers,
                     body: JSON.stringify(newData)

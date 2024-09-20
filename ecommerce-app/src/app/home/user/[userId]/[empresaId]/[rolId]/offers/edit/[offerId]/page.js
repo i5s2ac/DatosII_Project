@@ -38,7 +38,7 @@ export default function EditOfferPage({ params }) {
     useEffect(() => {
         const fetchOfferData = async () => {
             try {
-                const res = await fetch(`/api/ofertas/${offerId}`);
+                const res = await fetch(`/api/OffersCompany/${offerId}`);
                 const data = await res.json();
 
                 if (res.ok && data.oferta) {
@@ -146,7 +146,7 @@ export default function EditOfferPage({ params }) {
         // Repite para otros campos según tus necesidades
 
         try {
-            const res = await fetch(`/api/ofertas/${offerId}/update`, {
+            const res = await fetch(`/api/OffersCompany/${offerId}/update`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

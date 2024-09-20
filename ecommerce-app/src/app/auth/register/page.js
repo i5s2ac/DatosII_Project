@@ -14,7 +14,7 @@ export default function RegisterPage() {
     const handleRegister = async (e) => {
         e.preventDefault();
 
-        const res = await fetch('/api/register', {
+        const res = await fetch('/api/Auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

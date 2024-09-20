@@ -65,7 +65,7 @@ export default function UserPage({ params }) {
 
         try {
             const token = localStorage.getItem('token');  // Agregar token para la autenticación
-            const res = await fetch(`/api/user/${userId}`, {
+            const res = await fetch(`/api/user/${userId}/ProfileConfiguration/edit`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,  // Autorización con token

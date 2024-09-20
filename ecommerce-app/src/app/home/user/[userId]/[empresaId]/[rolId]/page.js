@@ -87,7 +87,7 @@ export default function UserPage({ params }) {
 
         const fetchJobOffers = async () => {
             try {
-                const res = await fetch(`/api/ofertas?empresaId=${empresaId}&userId=${userId}`);
+                const res = await fetch(`/api/OffersCompany?empresaId=${empresaId}&userId=${userId}`);
                 const data = await res.json();
                 if (data.success) {
                     setJobOffers(data.ofertas);
@@ -176,7 +176,7 @@ export default function UserPage({ params }) {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`/api/ofertas/${offerId}/delete`, {
+                    const res = await fetch(`/api/OffersCompany/${offerId}/delete`, {
                         method: 'DELETE',
                     });
                     if (res.ok) {
@@ -203,7 +203,7 @@ export default function UserPage({ params }) {
             const token = localStorage.getItem('token');
             const newStatus = currentStatus === 'Activo' ? 'Inactivo' : 'Activo';
 
-            const res = await fetch(`/api/ofertas/${offerId}/update`, {
+            const res = await fetch(`/api/OffersCompany/${offerId}/update`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -322,44 +322,6 @@ export default function UserPage({ params }) {
         </div>
     );
 
-
-
-const settings = {
-        dots: true,
-        infinite: false,
-        speed: 500,
-        vertical: true,
-        slidesToShow: 2,
-        slidesToScroll: 2,
-        appendDots: (dots) => (
-            <div style={{ marginTop: "40px" }}>
-                <ul style={{ margin: "0px" }}> {dots} </ul>
-            </div>
-        ),
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                },
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                },
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                },
-            },
-        ],
-    };
 
     return (
         <div className="min-h-screen flex flex-col bg-white">
@@ -640,32 +602,35 @@ const settings = {
 
                         <div className="w-full md:w-1/3 pr-4">
                             <h2 className="text-2xl font-semibold text-gray-800 mt-8">Plazas Creadas</h2>
-                            <p className="text-md text-gray-500 mt-3">Estamos listos para ayudarte a encontrar tu
-                                próximo reto</p>
+                            <p className="text-md text-gray-500 mt-3">
+                                Estamos listos para ayudarte a encontrar tu próximo reto
+                            </p>
 
-                            {filteredOffers.length === 0 ? (
-                                <p className="text-gray-600 border border-gray-200 p-3 mt-4 rounded-md">No se
-                                    encontraron
-                                    ofertas de trabajo.</p>
-                            ) : (
-                                <Slider {...settings}>
-                                    {filteredOffers.map((offer) => (
+                            <div className=" max-h-[650px] overflow-y-auto pr-4">
+                                {filteredOffers.length === 0 ? (
+                                    <p className="text-gray-600 border border-gray-200 p-3 mt-4 rounded-md">
+                                        No se encontraron ofertas de trabajo.
+                                    </p>
+                                ) : (
+                                    filteredOffers.map((offer) => (
                                         <div key={offer.id} className="p-2 mt-4">
                                             <div
                                                 className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300 ease-in-out relative">
-
                                                 {/* Icono, Título y Menú */}
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div className="flex items-center">
                                                         <div
                                                             className="bg-purple-600 rounded-md h-12 w-12 flex items-center justify-center">
-                                                            <span
-                                                                className="text-lg font-bold text-white">{offer.titulo.charAt(0)}</span>
+                                    <span className="text-lg font-bold text-white">
+                                        {offer.titulo.charAt(0)}
+                                    </span>
                                                         </div>
                                                         {/* Título */}
                                                         <div className="mt-6 mb-4">
                                                             <p className="text-lg font-semibold text-gray-900 ml-4 truncate">
-                                                                {offer.titulo.length > 20 ? `${offer.titulo.substring(0, 20)}...` : offer.titulo}
+                                                                {offer.titulo.length > 20
+                                                                    ? `${offer.titulo.substring(0, 20)}...`
+                                                                    : offer.titulo}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -674,7 +639,8 @@ const settings = {
                                                     <div className="flex space-x-2">
                                                         <button
                                                             onClick={() => router.push(`/home/user/${userId}/${empresaId}/${rolId}/offers/edit/${offer.id}`)}
-                                                            className="text-blue-600 hover:text-blue-800 transition">
+                                                            className="text-blue-600 hover:text-blue-800 transition"
+                                                        >
                                                             <PencilIcon className="h-5 w-5"/>
                                                         </button>
                                                         <button onClick={() => handleDeleteOffer(offer.id)}
@@ -686,7 +652,9 @@ const settings = {
 
                                                 {/* Descripción */}
                                                 <p className="text-gray-600 mb-4 text-md leading-tight">
-                                                    {offer.descripcion.length > 100 ? `${offer.descripcion.substring(0, 100)}...` : offer.descripcion}
+                                                    {offer.descripcion.length > 100
+                                                        ? `${offer.descripcion.substring(0, 100)}...`
+                                                        : offer.descripcion}
                                                 </p>
 
                                                 {/* Modalidad */}
@@ -700,20 +668,23 @@ const settings = {
                                                 </p>
 
                                                 {/* Salario */}
-                                                <div
-                                                    className="text-md font-bold text-gray-600 mb-4">{`Q${parseFloat(offer.salario).toLocaleString()}`}</div>
+                                                <div className="text-md font-bold text-gray-600 mb-4">
+                                                    {`Q${parseFloat(offer.salario).toLocaleString()}`}
+                                                </div>
 
                                                 {/* Etiquetas */}
                                                 <div className="mt-6 flex flex-wrap gap-2">
-                                                    {/* Mostrar los tags de la oferta */}
-                                                    {offer.tags && (
-                                                        (Array.isArray(offer.tags) ? offer.tags : offer.tags.split(',')).map((tag, index) => (
-                                                            <span key={index}
-                                                                  className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded">
-                {tag.trim()}
-            </span>
-                                                        ))
-                                                    )}
+                                                    {offer.tags &&
+                                                        (Array.isArray(offer.tags)
+                                                            ? offer.tags
+                                                            : offer.tags.split(',')).map((tag, index) => (
+                                                            <span
+                                                                key={index}
+                                                                className="bg-gray-100 text-gray-800 text-sm font-medium px-2 py-0.5 rounded"
+                                                            >
+                                            {tag.trim()}
+                                        </span>
+                                                        ))}
                                                 </div>
 
                                                 {/* Botones fijos */}
@@ -724,19 +695,22 @@ const settings = {
                                                     </button>
                                                     <button
                                                         onClick={() => handleToggleStatus(offer.id, offer.estatus)}
-                                                        className={`px-4 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${offer.estatus === "Activo" ? "bg-red-600 text-white hover:bg-red-700" : "bg-green-600 text-white hover:bg-green-700"}`}
+                                                        className={`px-4 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${
+                                                            offer.estatus === 'Activo'
+                                                                ? 'bg-red-600 text-white hover:bg-red-700'
+                                                                : 'bg-green-600 text-white hover:bg-green-700'
+                                                        }`}
                                                     >
-                                                        {offer.estatus === "Activo" ? "Desactivar Trabajo" : "Activar Trabajo"}
+                                                        {offer.estatus === 'Activo' ? 'Desactivar Trabajo' : 'Activar Trabajo'}
                                                     </button>
-
-
                                                 </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </Slider>
-                            )}
+                                    ))
+                                )}
+                            </div>
                         </div>
+
 
                         <div className="w-full md:w-2/3 pl-4 ">
                             <h2 className="text-2xl font-semibold text-gray-800 mt-7 ">Candidatos</h2>
